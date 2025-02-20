@@ -1,0 +1,36 @@
+{% extends "sic/base.html" %}
+
+{% block content %}
+<h2>Profile Page</h2>
+
+<!-- Display YouTube Channel Name -->
+<p><strong>Channel Name:</strong> {{ youtube_user.channel_name }}</p>
+
+<!-- Social Media Linking -->
+<h3>Link Social Media Accounts</h3>
+
+<p>
+    {% if youtube_user.instagram_id %}
+        ✅ Instagram Linked
+    {% else %}
+        <a href="{% url 'link_meta' %}">Link Instagram</a>
+    {% endif %}
+</p>
+
+<p>
+    {% if youtube_user.facebook_id %}
+        ✅ Facebook Linked
+    {% else %}
+        <a href="{% url 'link_meta' %}">Link Facebook</a>
+    {% endif %}
+</p>
+
+<p>
+    {% if youtube_user.x_id %}
+        ✅ X (Twitter) Linked
+    {% else %}
+        <a href="{% url 'link_x' %}">Link X (Twitter)</a>
+    {% endif %}
+</p>
+
+{% endblock %}

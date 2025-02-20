@@ -1,0 +1,54 @@
+{% extends "sic/base.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+<div id="youtubeUserDetailSidebar">
+    <h2>{{ youtube_user.channel_name }}</h2>
+    <p><strong>Owner Name:</strong> {{ youtube_user.owner_name }}</p>
+    <p><strong>Phone:</strong> {{ youtube_user.phone_number }}</p>
+    <p><strong>Category:</strong> {{ youtube_user.channel_category }}</p>
+    <p><strong>Email:</strong> {{ youtube_user.user.email }}</p>
+    <p><strong>Total Subscribers:</strong> {{ total_subscribers }}</p>
+    <p><strong>Total Channel Views:</strong> {{ total_views }}</p>
+    <p><strong>Country:</strong> {{ country }}</p>
+
+    <h3>Latest Videos</h3>
+    <ul>
+        {% for video in videos %}
+            <li>
+                <img src="{{ video.thumbnail }}" alt="Thumbnail">
+                <p><strong>{{ video.title }}</strong></p>
+                <p>Views: {{ video.views }} | Likes: {{ video.likes }} | Comments: {{ video.comments }}</p>
+                <a href="https://www.youtube.com/watch?v={{ video.videoId }}" target="_blank">Watch</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% comment %} <style>
+    #youtubeUserDetailSidebar {
+        position: fixed;
+        top: 0;
+        right: -400px; /* Initially hidden */
+        width: 400px;
+        height: 100%;
+        background: white;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        transition: right 0.3s ease-in-out;
+    }
+
+    #youtubeUserDetailSidebar.active {
+        right: 0; /* Show when active */
+    }
+</style> {% endcomment %}
+
+<script>
+    function openSidebar() {
+        document.getElementById("youtubeUserDetailSidebar").classList.add("active");
+    }
+
+    function closeSidebar() {
+        document.getElementById("youtubeUserDetailSidebar").classList.remove("active");
+    }
+</script>
+{% endblock %}

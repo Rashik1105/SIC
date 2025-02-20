@@ -1,0 +1,70 @@
+{% extends "sic/base.html" %}
+{% block title %}YouTube Analytics Dashboard{% endblock %}
+{% block content %}
+{% if user_type == "youtuber" %}
+<div class="container mt-5">
+        <h2>Welcome, {{ user.email }}</h2>
+        <p><strong>Subscribers:</strong> {{ channel.subscriberCount }}</p>
+        <p><strong>Total Views:</strong> {{ channel.viewCount }}</p>
+        <p><strong>Video Count:</strong> {{ channel.videoCount }}</p>
+
+        <h3 class="mt-4">Last 10 Public Videos</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Views</th>
+                    <th>Likes</th>
+                    <th>Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for video in videos %}
+                <tr>
+                    <td><a href="{{video.url}}">{{ video.title }}</a></td>
+                    <td>{{ video.views }}</td>
+                    <td>{{ video.likes }}</td>
+                    <td>{{ video.comments }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{% url 'logout' %}" class="btn btn-danger mt-3">Logout</a>
+    </div>
+    {% endif %}
+    {% if user_type == "business" %} 
+    <h2>YouTube Influencers Matching Your Interests</h2>
+    {% if youtube_users %}
+        <ul>
+            {% for yt_user in youtube_users %}
+                <li>
+                    <strong><a href="{% url "youtube_user_detail" yt_user.id %}"> {{ yt_user.user.first_name }}</a></strong> - Category: {{ yt_user.channel_category.name }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No matching YouTube influencers found.</p>
+    {% endif %}
+{% endif %}
+{% endblock %}
+
+{% comment %} {% extends "sic/base.html" %}
+{% block title %}YouTube Analytics Dashboard{% endblock %}
+{% block content %}
+<h1>YouTube Analytics</h1>
+<h2>Channel Overview</h2>
+<p><strong>Subscribers:</strong> {{ channel.subscriberCount }}</p>
+<p><strong>Total Views:</strong> {{ channel.viewCount }}</p>
+<p><strong>Video Count:</strong> {{ channel.videoCount }}</p>
+
+<h2>Last 10 Videos</h2>
+<ul>
+    {% for video in videos %}
+        <li>
+            <a href="{{ video.url }}" target="_blank">{{ video.title }}</a> - 
+            Views: {{ video.views }} | Likes: {{ video.likes }} | Comments: {{ video.comments }}
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %} {% endcomment %}

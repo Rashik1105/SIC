@@ -1,0 +1,11 @@
+{% extends 'sic/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h2>Welcome to Social Influencers Connect</h2>
+    Youtuber :
+    <a href="{% url 'youtube_login' %}">Login with Google</a>
+    <br>
+    Bussiness : <a href="{% url 'bussiness_login' %}">Login here</a>
+{% endblock %}

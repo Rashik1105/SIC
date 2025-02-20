@@ -1,0 +1,23 @@
+{% extends "sic/base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<h2>Login or Register</h2>
+
+<!-- Login Form -->
+<form method="post">
+    {% csrf_token %}
+    <h3>Login</h3>
+    {{ login_form.as_p }}
+    <button type="submit" name="login">Login</button>
+</form>
+
+<hr>
+
+<!-- Registration Form -->
+<form method="post">
+    {% csrf_token %}
+    <h3>Register</h3>
+    {{ register_form.as_p }}
+    <button type="submit" name="register">Register</button>
+</form>
+{% endblock %}
