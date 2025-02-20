@@ -22,13 +22,15 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from .leaderboard import calculate_leaderboard,calculate_combined_leaderboard
 from django.contrib.auth.decorators import login_required
+from dotenv import load_dotenv
+import os
 
-
+load_dotenv()
 # Configure Google OAuth
-GOOGLE_CLIENT_ID = '984169446212-fuohon0qebcbi27vgu88boc5cqrrd7in.apps.googleusercontent.com'
-GOOGLE_CLIENT_SECRET = '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'
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = 'http://127.0.0.1:8000/oauth2callback/'
-YOUTUBE_API_KEY='AIzaSyBmmWxIU5jSZn7htoTIPqhqaHvpqZtNVLo'
+YOUTUBE_API_KEY=os.getenv("YOUTUBE_API_KEY")
 SCOPES = [
     'https://www.googleapis.com/auth/youtube.readonly',
     'https://www.googleapis.com/auth/yt-analytics.readonly',
@@ -333,7 +335,7 @@ def combined_leaderboard_view(request):
 
 
 def link_meta(request):
-    META_CLIENT_ID = "655368260507001"
+    META_CLIENT_ID = os.getenv("META_CLIENT_ID")
     REDIRECT_URI = "http://127.0.0.1:8000/oauth/meta/callback/"
     
     oauth_url = f"https://www.facebook.com/v18.0/dialog/oauth?client_id={META_CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope=email,public_profile,pages_show_list,instagram_basic"
@@ -358,8 +360,8 @@ def profile(request):
 
 @login_required
 def meta_callback(request):
-    META_CLIENT_ID = "655368260507001"
-    META_CLIENT_SECRET = "d2f7e268781b09164a0c66f656a00443"
+    META_CLIENT_ID = os.getenv("META_CLIENT_ID")
+    META_CLIENT_SECRET = os.getenv("META_CLIENT_SECRET")
     REDIRECT_URI = "http://127.0.0.1:8000/oauth/meta/callback/"
 
     # Get authorization code from Meta
