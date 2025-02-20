@@ -1,9 +1,12 @@
 {
-    "build": {
-      "builder": "NIXPACKS"
-    },
-    "deploy": {
-      "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT"
+  "build": {
+    "builder": "Nixpacks",
+    "buildCommand": "pip install -r requirements.txt"
+  },
+  "deploy": {
+    "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT",
+    "env": {
+      "PYTHON_VERSION": "3.10"
     }
   }
-  
+}

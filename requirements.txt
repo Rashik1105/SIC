@@ -74,7 +74,6 @@ python-dateutil==2.9.0.post0
 python-telegram-bot==21.10
 pytz==2024.2
 pyunormalize==16.0.0
-pywin32==308
 regex==2024.11.6
 requests==2.32.3
 requests-oauthlib==2.0.0
