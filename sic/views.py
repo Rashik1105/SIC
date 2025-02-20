@@ -24,11 +24,15 @@ from .leaderboard import calculate_leaderboard,calculate_combined_leaderboard
 from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
 import os
+import secrets
+import hashlib
+import base64
 
 load_dotenv()
 # Configure Google OAuth
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+# GOOGLE_REDIRECT_URI = 'http://127.0.0.1:8000/oauth2callback/'
 GOOGLE_REDIRECT_URI = 'https://web-production-aa4a5.up.railway.app/oauth2callback/'
 YOUTUBE_API_KEY=os.getenv("YOUTUBE_API_KEY")
 SCOPES = [
@@ -61,7 +65,7 @@ def youtube_login(request):
         return redirect("dashboard")
     flow.redirect_uri = GOOGLE_REDIRECT_URI
     # login_hint='aizenytchannel@gmail.com'
-    authorization_url, x = flow.authorization_url(prompt='consent', access_type='offline', include_granted_scopes='true',)
+    authorization_url, x = flow.authorization_url(prompt='consent', access_type='offline', include_granted_scopes='true',login_hint='aizenytchannel@gmail.com')
     # print(authorization_url)
     return redirect(authorization_url)
 
@@ -336,7 +340,9 @@ def combined_leaderboard_view(request):
 
 def link_meta(request):
     META_CLIENT_ID = os.getenv("META_CLIENT_ID")
-    REDIRECT_URI = "http://127.0.0.1:8000/oauth/meta/callback/"
+    # REDIRECT_URI = "http://127.0.0.1:8000/oauth/meta/callback/"
+    REDIRECT_URI = "https://web-production-aa4a5.up.railway.app/oauth/meta/callback/"
+
     
     oauth_url = f"https://www.facebook.com/v18.0/dialog/oauth?client_id={META_CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope=email,public_profile,pages_show_list,instagram_basic"
     
@@ -362,7 +368,9 @@ def profile(request):
 def meta_callback(request):
     META_CLIENT_ID = os.getenv("META_CLIENT_ID")
     META_CLIENT_SECRET = os.getenv("META_CLIENT_SECRET")
-    REDIRECT_URI = "http://127.0.0.1:8000/oauth/meta/callback/"
+    # REDIRECT_URI = "http://127.0.0.1:8000/oauth/meta/callback/"
+    REDIRECT_URI = "https://web-production-aa4a5.up.railway.app/oauth/meta/callback/"
+    
 
     # Get authorization code from Meta
     code = request.GET.get("code")
@@ -403,14 +411,25 @@ def meta_callback(request):
     return redirect("profile")
 
 
-X_CLIENT_ID = "YOUR_X_CLIENT_ID"
-X_REDIRECT_URI = "http://127.0.0.1:8000/oauth/x/callback/"
+X_CLIENT_ID = os.getenv("X_CLIENT_ID")
+# X_REDIRECT_URI = "http://127.0.0.1:8000/oauth/x/callback/"
+X_REDIRECT_URI = "https://web-production-aa4a5.up.railway.app/oauth/x/callback/"
 X_AUTH_URL = "https://twitter.com/i/oauth2/authorize"
 
 @login_required
 def link_x(request):
     state = str(uuid.uuid4())  # Generate a random state token for security
-    request.session["oauth_state"] = state  # Store in session for validation
+    request.session["oauth_state"] = state  # Store state in session
+
+    # Generate a secure code verifier for PKCE
+    code_verifier = secrets.token_urlsafe(64)  # 43-128 characters recommended
+    code_challenge = base64.urlsafe_b64encode(
+        hashlib.sha256(code_verifier.encode()).digest()
+    ).decode().rstrip("=")  # Create a code challenge
+
+    # Store code verifier in session for later verification
+    request.session["oauth_code_verifier"] = code_verifier
+    request.session.modified = True  # Ensure session data is saved
 
     params = {
         "response_type": "code",
@@ -418,41 +437,77 @@ def link_x(request):
         "redirect_uri": X_REDIRECT_URI,
         "scope": "tweet.read users.read offline.access",
         "state": state,
-        "code_challenge": "challenge_string",  # PKCE Code challenge
-        "code_challenge_method": "plain",
+        "code_challenge": code_challenge,  # Use the derived challenge
+        "code_challenge_method": "S256",  # Use SHA256 instead of "plain"
     }
 
     auth_url = f"{X_AUTH_URL}?{requests.compat.urlencode(params)}"
     return redirect(auth_url)
 
+import base64
+
 @login_required
 def x_callback(request):
-    X_CLIENT_ID = "YOUR_X_CLIENT_ID"
-    X_CLIENT_SECRET = "YOUR_X_CLIENT_SECRET"
-    X_REDIRECT_URI = "https://yourdomain.com/oauth/x/callback/"
+    X_CLIENT_ID = os.getenv("X_CLIENT_ID")
+    X_CLIENT_SECRET = os.getenv("X_CLIENT_SECRET")
+    # X_REDIRECT_URI = "http://127.0.0.1:8000/oauth/x/callback/"
+    X_REDIRECT_URI = "https://web-production-aa4a5.up.railway.app/oauth/x/callback/"
     X_TOKEN_URL = "https://api.twitter.com/2/oauth2/token"
 
-    if request.GET.get("state") != request.session["oauth_state"]:
-        return redirect("profile")  # Security check failed
+    # Debugging: Print session and request data
+    print("Session Data:", request.session)
+    print("Request GET Data:", request.GET)
+
+    # Validate state
+    if request.GET.get("state") != request.session.get("oauth_state"):
+        return JsonResponse({"error": "State mismatch"}, status=400)
 
     code = request.GET.get("code")
+    code_verifier = request.session.get("oauth_code_verifier")
 
-    # Exchange authorization code for access token
-    response = requests.post(X_TOKEN_URL, data={
-        "client_id": X_CLIENT_ID,
-        "client_secret": X_CLIENT_SECRET,
+    # Debugging: Ensure code and code_verifier exist
+    print("Authorization Code:", code)
+    print("Code Verifier:", code_verifier)
+
+    if not code:
+        return JsonResponse({"error": "Missing authorization code"}, status=400)
+    if not code_verifier:
+        return JsonResponse({"error": "Missing code verifier"}, status=400)
+
+    # Create Basic Auth header (base64 encoding of client_id:client_secret)
+    credentials = f"{X_CLIENT_ID}:{X_CLIENT_SECRET}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+
+    headers = {
+        "Authorization": f"Basic {encoded_credentials}",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+
+    data = {
         "code": code,
         "redirect_uri": X_REDIRECT_URI,
         "grant_type": "authorization_code",
-        "code_verifier": "challenge_string"
-    }).json()
+        "code_verifier": code_verifier,
+    }
 
-    access_token = response.get("access_token")
+    # Exchange authorization code for access token
+    response = requests.post(X_TOKEN_URL, headers=headers, data=data)
+    response_json = response.json()
 
-    # Get user details
+    print("Access Token Response:", response_json)  # Debugging
+
+    access_token = response_json.get("access_token")
+
+    if not access_token:
+        return JsonResponse({"error": "Failed to get access token", "details": response_json}, status=400)
+
+    # Fetch user details
     user_info = requests.get("https://api.twitter.com/2/users/me", headers={
         "Authorization": f"Bearer {access_token}"
     }).json()
+
+    # Debugging: Check user_info response
+    print("User Info Response:", user_info)
 
     # Store details in the database
     youtube_user = YoutubeUser.objects.get(user=request.user)
@@ -461,5 +516,3 @@ def x_callback(request):
     youtube_user.save()
 
     return redirect("profile")
-
-
