@@ -29,7 +29,7 @@ load_dotenv()
 # Configure Google OAuth
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-GOOGLE_REDIRECT_URI = 'http://127.0.0.1:8000/oauth2callback/'
+GOOGLE_REDIRECT_URI = 'https://web-production-aa4a5.up.railway.app/oauth2callback/'
 YOUTUBE_API_KEY=os.getenv("YOUTUBE_API_KEY")
 SCOPES = [
     'https://www.googleapis.com/auth/youtube.readonly',
