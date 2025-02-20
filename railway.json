@@ -1,0 +1,9 @@
+{
+    "build": {
+      "builder": "NIXPACKS"
+    },
+    "deploy": {
+      "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT"
+    }
+  }
+  
