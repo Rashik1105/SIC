@@ -96,5 +96,9 @@ web3==7.7.0
 websockets==13.1
 yarl==1.18.3
 python-dotenv==1.0.1
+django-celery-beat
+redis
+billiard
+werkzeug
 gunicorn
 whitenoise

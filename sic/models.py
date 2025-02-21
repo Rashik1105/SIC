@@ -91,3 +91,10 @@ class InfluencerMetrics(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.platform.name}"
+    
+    def update_metrics(self, views, likes, comments):
+        """ Update influencer metrics with new values. """
+        self.views = views
+        self.likes = likes
+        self.comments = comments
+        self.save()

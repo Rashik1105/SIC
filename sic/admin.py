@@ -5,3 +5,5 @@ from .models import *
 admin.site.register(YoutubeUser)
 admin.site.register(Category)
 admin.site.register(BusinessProfile)
+admin.site.register(SocialPlatform)
+admin.site.register(InfluencerMetrics)

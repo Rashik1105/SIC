@@ -1,4 +1,4 @@
-from .models import InfluencerMetrics, SocialPlatform
+from .models import InfluencerMetrics, SocialPlatform, YoutubeUser
 from django.db.models import Max
 from django.db.models import Max, Sum
 
@@ -32,7 +32,7 @@ def calculate_leaderboard():
         final_score = (normalized_views * 0.5) + (normalized_likes * 0.3) + (normalized_comments * 0.2)
 
         leaderboard.append({
-            "user": influencer.user,
+            "user": influencer.user.youtubeuser.channel_name,
             "platform": influencer.platform.name,
             "score": round(final_score, 4)
         })
@@ -68,7 +68,13 @@ def calculate_combined_leaderboard():
         total_comments=Sum('comments')
     )
 
+    # Fetch all YoutubeUser data to avoid multiple DB queries
+    youtube_users = {yu.user_id: yu.channel_name for yu in YoutubeUser.objects.all()}
+
     for influencer in influencers:
+        user_id = influencer['user']
+        channel_name = youtube_users.get(user_id, f"User-{user_id}")  # Default to "User-ID" if no channel name exists
+
         normalized_views = influencer['total_views'] / max_views
         normalized_likes = influencer['total_likes'] / max_likes
         normalized_comments = influencer['total_comments'] / max_comments
@@ -77,7 +83,7 @@ def calculate_combined_leaderboard():
         final_score = (normalized_views * 0.5) + (normalized_likes * 0.3) + (normalized_comments * 0.2)
 
         leaderboard.append({
-            "user": influencer['user'],
+            "user": channel_name,  # Use YouTube channel name instead of User object
             "score": round(final_score, 4)
         })
 
@@ -85,3 +91,4 @@ def calculate_combined_leaderboard():
     leaderboard = sorted(leaderboard, key=lambda x: x['score'], reverse=True)
 
     return leaderboard
+
