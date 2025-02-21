@@ -344,7 +344,7 @@ def link_meta(request):
     REDIRECT_URI = "https://web-production-aa4a5.up.railway.app/oauth/meta/callback/"
 
     
-    oauth_url = f"https://www.facebook.com/v18.0/dialog/oauth?client_id={META_CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope=email,public_profile,pages_show_list,instagram_basic"
+    oauth_url = f"https://www.facebook.com/v18.0/dialog/oauth?client_id={META_CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope=email,public_profile"
     
     return redirect(oauth_url)
 
@@ -370,13 +370,15 @@ def meta_callback(request):
     META_CLIENT_SECRET = os.getenv("META_CLIENT_SECRET")
     # REDIRECT_URI = "http://127.0.0.1:8000/oauth/meta/callback/"
     REDIRECT_URI = "https://web-production-aa4a5.up.railway.app/oauth/meta/callback/"
-    
 
     # Get authorization code from Meta
     code = request.GET.get("code")
+    if not code:
+        return redirect("profile")  # Redirect if no code is received
+
     token_url = "https://graph.facebook.com/v18.0/oauth/access_token"
 
-    # Exchange code for access token
+    # Exchange authorization code for access token
     response = requests.get(token_url, params={
         "client_id": META_CLIENT_ID,
         "client_secret": META_CLIENT_SECRET,
@@ -385,15 +387,12 @@ def meta_callback(request):
     }).json()
 
     access_token = response.get("access_token")
+    if not access_token:
+        return redirect("profile")  # Redirect on failure
 
-    # Get user details
+    # Get user details (Facebook ID and Name)
     user_info = requests.get("https://graph.facebook.com/me", params={
-        "fields": "id,name",
-        "access_token": access_token
-    }).json()
-
-    # Get Instagram business account if available
-    instagram_info = requests.get(f"https://graph.facebook.com/{user_info['id']}/accounts", params={
+        "fields": "id,name,email",
         "access_token": access_token
     }).json()
 
@@ -401,14 +400,10 @@ def meta_callback(request):
     youtube_user = YoutubeUser.objects.get(user=request.user)
     youtube_user.facebook_id = user_info["id"]
     youtube_user.facebook_token = access_token
-
-    if "data" in instagram_info and len(instagram_info["data"]) > 0:
-        youtube_user.instagram_id = instagram_info["data"][0]["id"]
-        youtube_user.instagram_token = access_token
-
     youtube_user.save()
 
     return redirect("profile")
+
 
 
 X_CLIENT_ID = os.getenv("X_CLIENT_ID")
