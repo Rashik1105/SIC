@@ -1,19 +1,12 @@
 {
   "build": {
     "builder": "Nixpacks",
-    "buildCommand": "pip install -r requirements.txt && python manage.py migrate"
+    "buildCommand": "pip install -r requirements.txt"
   },
   "deploy": {
-    "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT"
-  },
-  "services": [
-    {
-      "name": "celery-worker",
-      "startCommand": "celery -A SocialInfluencersConnect worker --loglevel=info"
-    },
-    {
-      "name": "celery-beat",
-      "startCommand": "celery -A SocialInfluencersConnect beat --loglevel=info"
+    "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT",
+    "env": {
+      "PYTHON_VERSION": "3.10"
     }
-  ]
+  }
 }
