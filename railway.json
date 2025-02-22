@@ -8,5 +8,15 @@
     "env": {
       "PYTHON_VERSION": "3.10"
     }
-  }
+  },
+  "services": [
+    {
+      "name": "worker",
+      "startCommand": "celery -A SocialInfluencersConnect worker --loglevel=info"
+    },
+    {
+      "name": "beat",
+      "startCommand": "celery -A SocialInfluencersConnect beat --loglevel=info"
+    }
+  ]
 }
