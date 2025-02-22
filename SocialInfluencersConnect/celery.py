@@ -26,14 +26,14 @@ def debug_task(self):
 app.conf.beat_schedule = {
     'update-leaderboard-weekly': {
         'task': 'sic.tasks.update_leaderboard',  
-        'schedule': crontab(minute=0, hour=0, day_of_week=0),  # Every Sunday at 00:00
+        'schedule': crontab(minute=0, hour=1, day_of_week=0),  # Every Sunday at 01:00
     },
     'update-combined-leaderboard-weekly': {
         'task': 'sic.tasks.update_combined_leaderboard',  
-        'schedule': crontab(minute=5, hour=0, day_of_week=0),  # Every Sunday at 00:05
+        'schedule': crontab(minute=0, hour=1, day_of_week=0),  # Every Sunday at 01:00
     },
     'fetch-social-media-data': {
         'task': 'sic.tasks.fetch_social_media_data',  
-        'schedule': crontab(minute=0, hour=1, day_of_week=0),  # Every Sunday at 01:00
+        'schedule': crontab(minute=5, hour=0, day_of_week=0),  # Every Sunday at 00:05
     },
 }
