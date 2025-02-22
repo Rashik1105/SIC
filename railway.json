@@ -11,11 +11,11 @@
   },
   "services": [
     {
-      "name": "worker",
+      "name": "celery-worker",
       "startCommand": "celery -A SocialInfluencersConnect worker --loglevel=info"
     },
     {
-      "name": "beat",
+      "name": "celery-beat",
       "startCommand": "celery -A SocialInfluencersConnect beat --loglevel=info"
     }
   ]
