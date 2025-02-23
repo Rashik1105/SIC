@@ -8,7 +8,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect, render, get_object_or_404
 from django.conf import settings
 from django.contrib.auth import get_backends
-from django.urls import path
+from django.urls import path, reverse
 from google_auth_oauthlib.flow import Flow
 from django.forms import ModelForm
 from django.shortcuts import render, redirect
@@ -27,6 +27,8 @@ import os
 import secrets
 import hashlib
 import base64
+import requests
+import json
 
 load_dotenv()
 # Configure Google OAuth
@@ -54,6 +56,12 @@ flow = Flow.from_client_config({
     }
 }, scopes=SCOPES)
 
+
+def fetch_api_data(request):
+    api_url = request.build_absolute_uri(reverse('combined_leaderboard'))
+    response = requests.get(api_url)
+    data = response.json()
+    return JsonResponse(data, safe=False)
 
 def home(request):
     return render(request, 'sic/home.html')
@@ -206,6 +214,12 @@ def dashboard(request):
 
             # Find YouTube users who belong to any of the interested categories
             youtube_users = YoutubeUser.objects.filter(channel_category__in=interested_categories)
+            # Fetchs Leaderboard from api
+            leaderboard_api = fetch_api_data(request=request)
+            leaderboard = json.loads(s=leaderboard_api.content)["leaderboard"]
+            soretd_ids = [x["id"] for x in leaderboard if x["channel_category"] in interested_categories]
+            # Sorted out Youtube users according to leaderboard
+            youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
 
             return render(request, "sic/dashboard.html", {
                 "user_type": "business",

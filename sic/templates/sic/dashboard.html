@@ -36,13 +36,13 @@
     {% if user_type == "business" %} 
     <h2>YouTube Influencers Matching Your Interests</h2>
     {% if youtube_users %}
-        <ul>
+        <ol>
             {% for yt_user in youtube_users %}
                 <li>
                     <strong><a href="{% url "youtube_user_detail" yt_user.id %}"> {{ yt_user.user.first_name }}</a></strong> - Category: {{ yt_user.channel_category.name }}
                 </li>
             {% endfor %}
-        </ul>
+        </ol>
     {% else %}
         <p>No matching YouTube influencers found.</p>
     {% endif %}
