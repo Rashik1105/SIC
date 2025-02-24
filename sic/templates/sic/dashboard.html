@@ -3,7 +3,7 @@
 {% block content %}
 {% if user_type == "youtuber" %}
 <div class="container mt-5">
-        <h2>Welcome, {{ user.email }}</h2>
+        <h2>Welcome, {{ user.first_name}}</h2>
         <p><strong>Subscribers:</strong> {{ channel.subscriberCount }}</p>
         <p><strong>Total Views:</strong> {{ channel.viewCount }}</p>
         <p><strong>Video Count:</strong> {{ channel.videoCount }}</p>
@@ -30,23 +30,83 @@
             </tbody>
         </table>
 
+        <a href="{% url 'bussiness-list' %}" class="btn btn-info mt-3">Businesses Search</a>
+        <a href="{% url 'profile' %}" class="btn btn-warning mt-3">Profile</a>
         <a href="{% url 'logout' %}" class="btn btn-danger mt-3">Logout</a>
     </div>
-    {% endif %}
-    {% if user_type == "business" %} 
-    <h2>YouTube Influencers Matching Your Interests</h2>
-    {% if youtube_users %}
-        <ol>
-            {% for yt_user in youtube_users %}
-                <li>
-                    <strong><a href="{% url "youtube_user_detail" yt_user.id %}"> {{ yt_user.user.first_name }}</a></strong> - Category: {{ yt_user.channel_category.name }}
-                </li>
-            {% endfor %}
-        </ol>
-    {% else %}
-        <p>No matching YouTube influencers found.</p>
-    {% endif %}
 {% endif %}
+{% if user_type == "business" %}
+    <div class="influencer-container">
+        <h2>📢 YouTube Influencers Matching Your Interests</h2>
+
+        {% if youtube_users %}
+            <ul class="influencer-list">
+                {% for yt_user in youtube_users %}
+                    <li class="influencer-item">
+                        <a href="{% url 'youtube_user_detail' yt_user.id %}" class="influencer-name">
+                            {{ yt_user.user.first_name }}
+                        </a>
+                        <span class="category"> - Category: {{ yt_user.channel_category.name }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-results">🚫 No matching YouTube influencers found.</p>
+        {% endif %}
+    </div>
+{% endif %}
+
+<style>
+    .influencer-container {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+    }
+    
+    .influencer-container h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .influencer-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .influencer-item {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .influencer-item:last-child {
+        border-bottom: none;
+    }
+    
+    .influencer-name {
+        font-weight: bold;
+        text-decoration: none;
+        color: #007bff;
+    }
+    
+    .influencer-name:hover {
+        text-decoration: underline;
+    }
+    
+    .category {
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .no-results {
+        color: #888;
+        font-style: italic;
+    }
+    
+</style>
+
 {% endblock %}
 
 {% comment %} {% extends "sic/base.html" %}

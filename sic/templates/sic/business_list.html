@@ -1,0 +1,9 @@
+{% extends "sic/base.html" %}
+{% block content %}
+<h2>Businesses That match your Intrests</h2>
+    {% for business in bussiness_list %}
+    <ul>
+        <li>{{business}}</li>
+    </ul>
+    {% endfor %}
+{% endblock content %}

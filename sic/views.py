@@ -280,8 +280,14 @@ def bussiness_login_register(request):
 
 def youtube_user_detail(request, user_id):
     """ Fetch YouTube User details and their latest 10 videos """
+    # Define API URLs (Replace placeholders with actual API endpoints)
+
     youtube_user = YoutubeUser.objects.get(id=user_id)
 
+    INSTAGRAM_API_URL = "https://graph.instagram.com/me/media"
+    FACEBOOK_API_URL = "https://graph.facebook.com/v17.0/me/posts"
+    X_API_URL = "https://api.twitter.com/2/users/{}/tweets"
+    
     # Fetch channel statistics & country info
     channel_url = "https://www.googleapis.com/youtube/v3/channels"
     channel_params = {
@@ -331,14 +337,50 @@ def youtube_user_detail(request, user_id):
                 "likes": stats.get("likeCount", 0),
                 "comments": stats.get("commentCount", 0),
             })
+    # Fetch latest 5 Instagram posts
+    instagram_posts = []
+    if youtube_user.instagram_token:
+        insta_params = {"fields": "id,caption,media_type,media_url,permalink", "access_token": youtube_user.instagram_token, "limit": 5}
+        insta_response = requests.get(INSTAGRAM_API_URL, params=insta_params).json()
+        if "data" in insta_response:
+            instagram_posts = insta_response["data"][:5]  # Limit to 5 posts
+
+    # Fetch latest 5 Facebook posts
+    facebook_posts = []
+    if youtube_user.facebook_token:
+        fb_params = {"fields": "message,created_time,permalink_url", "access_token": youtube_user.facebook_token, "limit": 5}
+        fb_response = requests.get(FACEBOOK_API_URL, params=fb_params).json()
+        if "data" in fb_response:
+            facebook_posts = fb_response["data"][:5]
+
+    # Fetch latest 5 X (Twitter) posts
+    x_posts = []
+    if youtube_user.x_token:
+        headers = {"Authorization": f"Bearer {os.getenv("X_BEARER_TOKEN")}"}
+        x_response = requests.get(X_API_URL.format(youtube_user.x_id), headers=headers).json()
+        if "data" in x_response:
+            x_posts = x_response["data"][:5]
 
     return render(request, "sic/youtube_user_detail.html", {
         "youtube_user": youtube_user,
         "total_subscribers": total_subscribers,
         "total_views": total_views,
-        "country" : country,
-        "videos": video_details
+        "country": country,
+        "videos": video_details,
+        "instagram_posts": instagram_posts,
+        "facebook_posts": facebook_posts,
+        "x_posts": x_posts
     })
+    
+def y_bussiness_lists(request):
+    if request.user.groups.filter(name="YouTubeUser").exists():
+        youtube_profile_category = request.user.youtubeuser.channel_category
+        print(youtube_profile_category)
+        business_list = BusinessProfile.objects.filter(intrested_category__in=[youtube_profile_category])
+        return render(request,'sic/business_list.html',{"bussiness_list": business_list})
+    else:
+        return HttpResponse("<h1>Sorry your not Authenticated to access this page</h1>")
+    
 
 
 def leaderboard_view(request):

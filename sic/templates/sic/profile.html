@@ -1,36 +1,128 @@
 {% extends "sic/base.html" %}
 
 {% block content %}
-<h2>Profile Page</h2>
+<div class="profile-container">
+    <h2 class="profile-heading">🎥 Profile Page</h2>
 
-<!-- Display YouTube Channel Name -->
-<p><strong>Channel Name:</strong> {{ youtube_user.channel_name }}</p>
+    <!-- Profile Details -->
+    <div class="profile-card">
+        <h3 class="section-title">👤 Channel Information</h3>
+        <p><strong>📺 Channel Name:</strong> {{ youtube_user.channel_name }}</p>
+        <p><strong>📧 Channel Email:</strong> {{ youtube_user.user.email }}</p>
+        <p><strong>👑 Owner Name:</strong> {{ youtube_user.owner_name }}</p>
+        <p><strong>📞 Phone Number:</strong> {{ youtube_user.phone_number }}</p>
+        <p><strong>🏷️ Channel Category:</strong> {{ youtube_user.channel_category }}</p>
+        <p><strong>🔑 Channel Keywords:</strong> {{ youtube_user.getKeyWords|join:", " }}</p>
+    </div>
 
-<!-- Social Media Linking -->
-<h3>Link Social Media Accounts</h3>
+    <!-- Social Media Linking -->
+    <div class="social-links">
+        <h3 class="section-title">🔗 Link Social Media Accounts</h3>
 
-<p>
-    {% if youtube_user.instagram_id %}
-        ✅ Instagram Linked
-    {% else %}
-        <a href="{% url 'link_meta' %}">Link Instagram</a>
-    {% endif %}
-</p>
+        <div class="social-item">
+            {% if youtube_user.instagram_id %}
+                ✅ <strong>Instagram Linked</strong>
+            {% else %}
+                <a href="{% url 'link_meta' %}" class="link-button instagram">📷 Link Instagram</a>
+            {% endif %}
+        </div>
 
-<p>
-    {% if youtube_user.facebook_id %}
-        ✅ Facebook Linked
-    {% else %}
-        <a href="{% url 'link_meta' %}">Link Facebook</a>
-    {% endif %}
-</p>
+        <div class="social-item">
+            {% if youtube_user.facebook_id %}
+                ✅ <strong>Facebook Linked</strong>
+            {% else %}
+                <a href="{% url 'link_meta' %}" class="link-button facebook">📘 Link Facebook</a>
+            {% endif %}
+        </div>
 
-<p>
-    {% if youtube_user.x_id %}
-        ✅ X (Twitter) Linked
-    {% else %}
-        <a href="{% url 'link_x' %}">Link X (Twitter)</a>
-    {% endif %}
-</p>
+        <div class="social-item">
+            {% if youtube_user.x_id %}
+                ✅ <strong>X (Twitter) Linked</strong>
+            {% else %}
+                <a href="{% url 'link_x' %}" class="link-button twitter">🐦 Link X (Twitter)</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        font-family: 'Arial', sans-serif;
+    }
+    
+    .profile-heading {
+        text-align: center;
+        color: #222;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .profile-card {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #444;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+    }
+    
+    .profile-card p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #333;
+        margin: 8px 0;
+    }
+    
+    .social-links {
+        background: #f0f0f0;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .social-item {
+        margin: 10px 0;
+        font-size: 16px;
+    }
+    
+    .link-button {
+        display: inline-block;
+        padding: 8px 15px;
+        border-radius: 5px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    
+    .instagram {
+        background: #E1306C;
+    }
+    
+    .facebook {
+        background: #1877F2;
+    }
+    
+    .twitter {
+        background: #1DA1F2;
+    }
+    
+    .link-button:hover {
+        opacity: 0.8;
+    }    
+
+</style>
+
 
 {% endblock %}
