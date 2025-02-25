@@ -61,7 +61,7 @@ flow = Flow.from_client_config({
 def fetch_api_data(request):
     api_url = request.build_absolute_uri(reverse('combined_leaderboard'))
     try:
-        response = requests.get(api_url, timeout=10)  # Set a timeout of 10 seconds
+        response = requests.get(api_url, timeout=30)  # Set a timeout of 10 seconds
         response.raise_for_status()  # Raise an exception for HTTP errors
         data = response.json()
         print(data)
@@ -224,10 +224,14 @@ def dashboard(request):
             youtube_users = YoutubeUser.objects.filter(channel_category__in=interested_categories)
             # Fetchs Leaderboard from api
             leaderboard_api = fetch_api_data(request=request)
-            leaderboard = json.loads(s=leaderboard_api.content)["leaderboard"]
-            soretd_ids = [x["id"] for x in leaderboard if x["channel_category"] in interested_categories]
-            # Sorted out Youtube users according to leaderboard
-            youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
+            if 'leaderboard' in leaderboard_api:
+                print(f"api : {leaderboard_api}")
+                leaderboard = json.loads(s=leaderboard_api.content)["leaderboard"]
+                soretd_ids = [x["id"] for x in leaderboard if x["channel_category"] in interested_categories]
+                # Sorted out Youtube users according to leaderboard
+                youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
+            else:
+                print("API failed")
 
             return render(request, "sic/dashboard.html", {
                 "user_type": "business",
