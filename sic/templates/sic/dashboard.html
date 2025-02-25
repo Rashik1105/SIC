@@ -108,23 +108,3 @@
 </style>
 
 {% endblock %}
-
-{% comment %} {% extends "sic/base.html" %}
-{% block title %}YouTube Analytics Dashboard{% endblock %}
-{% block content %}
-<h1>YouTube Analytics</h1>
-<h2>Channel Overview</h2>
-<p><strong>Subscribers:</strong> {{ channel.subscriberCount }}</p>
-<p><strong>Total Views:</strong> {{ channel.viewCount }}</p>
-<p><strong>Video Count:</strong> {{ channel.videoCount }}</p>
-
-<h2>Last 10 Videos</h2>
-<ul>
-    {% for video in videos %}
-        <li>
-            <a href="{{ video.url }}" target="_blank">{{ video.title }}</a> - 
-            Views: {{ video.views }} | Likes: {{ video.likes }} | Comments: {{ video.comments }}
-        </li>
-    {% endfor %}
-</ul>
-{% endblock %} {% endcomment %}
