@@ -86,9 +86,6 @@ def update_influencer_data():
     influencers = YoutubeUser.objects.all()
     
     for influencer in influencers:
-        print(influencer)
-        print(influencer)
-        print(influencer)
         # YouTube
         if influencer.user:
             yt_metrics = fetch_youtube_metrics(influencer.user.username)
