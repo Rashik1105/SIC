@@ -61,9 +61,10 @@ def fetch_api_data(request):
     try:
         # Build the full URL for the 'combined_leaderboard_api' in the 'apis' app
         api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))  # Namespaced URL
+        headers = {"Accept": "application/json"}
 
         # Fetch data from the API with a timeout
-        response = requests.get(api_url, timeout=30)
+        response = requests.get(api_url, headers=headers , timeout=30)
 
         # Handle HTTP errors (4xx, 5xx)
         response.raise_for_status()
@@ -423,7 +424,8 @@ def leaderboard_page(request):
     try:
         # Fetch the combined leaderboard API from the 'apis' app
         api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))
-        response = requests.get(api_url, timeout=30)
+        headers = {"Accept": "application/json"}
+        response = requests.get(api_url, headers=headers , timeout=30)
         response.raise_for_status()
         
         # Parse JSON response
