@@ -59,9 +59,16 @@ flow = Flow.from_client_config({
 
 def fetch_api_data(request):
     api_url = request.build_absolute_uri(reverse('combined_leaderboard'))
-    response = requests.get(api_url)
-    data = response.json()
-    return JsonResponse(data, safe=False)
+    try:
+        response = requests.get(api_url, timeout=10)  # Set a timeout of 10 seconds
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        data = response.json()
+        print(data)
+        return JsonResponse(data, safe=False)
+    except RequestException as e:
+        # Log the error with more details
+        print(f"Error fetching data from API: {e}")
+        return JsonResponse({'error': 'Failed to fetch data from API'}, status=500, safe=False)
 
 def home(request):
     return render(request, 'sic/home.html')
