@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'sic.apps.SicConfig',
+    'apis.apps.ApisConfig',
+    'rest_framework',
 
 ]
 

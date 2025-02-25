@@ -1,13 +1,15 @@
-from .models import InfluencerMetrics, SocialPlatform, YoutubeUser
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from django.db.models import Max, Sum
 from django.db.models.functions import Coalesce
+from sic.models import InfluencerMetrics, YoutubeUser
+from .serializers import LeaderboardEntrySerializer, CombinedLeaderboardEntrySerializer
 
-def calculate_leaderboard():
+@api_view(['GET'])
+def calculate_leaderboard_api(request):
     """
-    Fetch influencer metrics, normalize scores, and rank influencers.
+    API to fetch, normalize, and rank influencers per platform.
     """
-
-    # Step 1: Get Max values across all influencers & platforms
     max_values = InfluencerMetrics.objects.aggregate(
         max_views=Max('views'),
         max_likes=Max('likes'),
@@ -20,15 +22,13 @@ def calculate_leaderboard():
 
     leaderboard = []
 
-    # Step 2: Fetch influencer metrics & compute score
-    influencers = InfluencerMetrics.objects.all()
-    
+    influencers = InfluencerMetrics.objects.select_related('user__youtubeuser', 'platform').all()
+
     for influencer in influencers:
         normalized_views = influencer.views / max_views
         normalized_likes = influencer.likes / max_likes
         normalized_comments = influencer.comments / max_comments
 
-        # Weighted Score Formula
         final_score = (normalized_views * 0.5) + (normalized_likes * 0.3) + (normalized_comments * 0.2)
 
         leaderboard.append({
@@ -37,19 +37,17 @@ def calculate_leaderboard():
             "score": round(final_score, 4)
         })
 
-    # Step 3: Sort by score in descending order
     leaderboard = sorted(leaderboard, key=lambda x: x['score'], reverse=True)
 
-    return leaderboard
+    serializer = LeaderboardEntrySerializer(leaderboard, many=True)
+    return Response(serializer.data)
 
 
-
-
-def calculate_combined_leaderboard():
+@api_view(['GET'])
+def calculate_combined_leaderboard_api(request):
     """
-    Fetch influencer metrics across all platforms, aggregate data, normalize scores, and rank influencers.
+    API to fetch, aggregate, normalize, and rank influencers across all platforms.
     """
-
     max_values = InfluencerMetrics.objects.aggregate(
         max_views=Max('views'),
         max_likes=Max('likes'),
@@ -86,6 +84,7 @@ def calculate_combined_leaderboard():
             "channel_category": yt_user.channel_category.name if yt_user else "Unknown"
         })
 
-    return sorted(leaderboard, key=lambda x: x['score'], reverse=True)
+    leaderboard = sorted(leaderboard, key=lambda x: x['score'], reverse=True)
 
-
+    serializer = CombinedLeaderboardEntrySerializer(leaderboard, many=True)
+    return Response(serializer.data)

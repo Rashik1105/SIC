@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background-color: #f4f4f4; }
+        .youtube-user { background-color: #ffeb3b; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>Influencer Leaderboard</h1>
+
+    {% if error %}
+        <p style="color: red; text-align: center;">{{ error }}</p>
+    {% endif %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Score</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for influencer in leaderboard %}
+                <tr class="{% if influencer.is_youtube_user %}youtube-user{% endif %}">
+                    <td>{{ influencer.rank }}</td>
+                    <td>{{ influencer.user }}</td>
+                    <td>{{ influencer.score }}</td>
+                    <td>{{ influencer.channel_category }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No data available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

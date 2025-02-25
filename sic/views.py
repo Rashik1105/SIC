@@ -20,9 +20,8 @@ from django.contrib.auth.models import Group
 import requests
 from django.http import HttpResponse
 from django.http import JsonResponse
-from .leaderboard import calculate_leaderboard,calculate_combined_leaderboard
 from django.contrib.auth.decorators import login_required
-from requests.exceptions import RequestException
+from requests.exceptions import RequestException, Timeout, ConnectionError, HTTPError
 from dotenv import load_dotenv
 import os
 import secrets
@@ -59,17 +58,39 @@ flow = Flow.from_client_config({
 
 
 def fetch_api_data(request):
-    api_url = request.build_absolute_uri(reverse('combined_leaderboard'))
     try:
-        response = requests.get(api_url, timeout=30)  # Set a timeout of 10 seconds
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        data = response.json()
-        print(data)
+        # Build the full URL for the 'combined_leaderboard_api' in the 'apis' app
+        api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))  # Namespaced URL
+
+        # Fetch data from the API with a timeout
+        response = requests.get(api_url, timeout=30)
+
+        # Handle HTTP errors (4xx, 5xx)
+        response.raise_for_status()
+
+        # Validate response JSON
+        try:
+            data = response.json()
+        except ValueError:
+            return JsonResponse({'error': 'Invalid JSON response from API'}, status=502)
+
+        if not isinstance(data, list):  # Ensure response is a list (leaderboard format)
+            return JsonResponse({'error': 'Unexpected API response format'}, status=502)
+
         return JsonResponse(data, safe=False)
+
+    except Timeout:
+        return JsonResponse({'error': 'API request timed out'}, status=504)  # Gateway Timeout
+
+    except ConnectionError:
+        return JsonResponse({'error': 'Failed to connect to API'}, status=503)  # Service Unavailable
+
+    except HTTPError as e:
+        return JsonResponse({'error': f'HTTP error {e.response.status_code}'}, status=e.response.status_code)
+
     except RequestException as e:
-        # Log the error with more details
-        print(f"Error fetching data from API: {e}")
-        return JsonResponse({'error': 'Failed to fetch data from API'}, status=500, safe=False)
+        return JsonResponse({'error': 'API request failed', 'details': str(e)}, status=502)  # Bad Gateway
+
 
 def home(request):
     return render(request, 'sic/home.html')
@@ -224,14 +245,18 @@ def dashboard(request):
             youtube_users = YoutubeUser.objects.filter(channel_category__in=interested_categories)
             # Fetchs Leaderboard from api
             leaderboard_api = fetch_api_data(request=request)
-            if 'leaderboard' in leaderboard_api:
-                print(f"api : {leaderboard_api}")
-                leaderboard = json.loads(s=leaderboard_api.content)["leaderboard"]
-                soretd_ids = [x["id"] for x in leaderboard if x["channel_category"] in interested_categories]
-                # Sorted out Youtube users according to leaderboard
-                youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
+            if leaderboard_api.status_code == 200:
+                try:
+                    leaderboard = json.loads(s=leaderboard_api.content)
+                    soretd_ids = [x["id"] for x in leaderboard if x["channel_category"] in [x.__str__() for x in interested_categories]]
+                    print(soretd_ids)
+                    # Sorted out Youtube users according to leaderboard
+                    youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
+                    print(youtube_users)
+                except Exception as e:
+                    JsonResponse({"error" : f"Unexpected error: {e}"})
             else:
-                print("API failed")
+                print(f"Leaderboard API failed with status code {leaderboard_api.status_code}")
 
             return render(request, "sic/dashboard.html", {
                 "user_type": "business",
@@ -387,23 +412,39 @@ def youtube_user_detail(request, user_id):
 def y_bussiness_lists(request):
     if request.user.groups.filter(name="YouTubeUser").exists():
         youtube_profile_category = request.user.youtubeuser.channel_category
-        print(youtube_profile_category)
         business_list = BusinessProfile.objects.filter(intrested_category__in=[youtube_profile_category])
-        return render(request,'sic/business_list.html',{"bussiness_list": business_list})
+        return render(request,'sic/business_list.html',{"business_list": business_list})
     else:
         return HttpResponse("<h1>Sorry your not Authenticated to access this page</h1>")
     
 
 
-def leaderboard_view(request):
-    leaderboard = calculate_leaderboard()
-    return JsonResponse({"leaderboard": leaderboard}, safe=False)
+def leaderboard_page(request):
+    try:
+        # Fetch the combined leaderboard API from the 'apis' app
+        api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))
+        response = requests.get(api_url, timeout=30)
+        response.raise_for_status()
+        
+        # Parse JSON response
+        try:
+            leaderboard_data = response.json()
+        except ValueError:
+            leaderboard_data = []
+            
+        # Highlight YouTube users in the leaderboard
+        for rank, influencer in enumerate(leaderboard_data, start=1):
+            influencer["rank"] = rank  # Add ranking position
+            influencer["is_youtube_user"] = influencer["user"] == request.user.youtubeuser.channel_name  # Mark YouTube users
 
 
+        return render(request, 'sic/leaderboard.html', {"leaderboard": leaderboard_data})
 
-def combined_leaderboard_view(request):
-    leaderboard = calculate_combined_leaderboard()
-    return JsonResponse({"leaderboard": leaderboard}, safe=False)
+    except (Timeout, ConnectionError, HTTPError, RequestException):
+        return render(request, 'sic/leaderboard.html', {"leaderboard": [], "error": "Failed to fetch leaderboard."})
+    
+    
+    
 
 
 def link_meta(request):

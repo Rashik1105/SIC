@@ -18,7 +18,6 @@ urlpatterns = [
     path("oauth/x/callback/", x_callback, name="x_callback"),
     path('dashboard', dashboard, name='dashboard'),
     path('logout', logout_view, name='logout'),
-    path('api/leaderboard/', leaderboard_view, name="leaderboard"),
-    path('api/combined-leaderboard/', combined_leaderboard_view, name="combined_leaderboard"),
+    path('leaderboard/', leaderboard_page, name='leaderboard_page'),
     path('accounts', include('allauth.urls')),  # Django-Allauth URLs
 ]

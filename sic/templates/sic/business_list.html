@@ -1,9 +1,147 @@
 {% extends "sic/base.html" %}
+
 {% block content %}
-<h2>Businesses That match your Intrests</h2>
-    {% for business in bussiness_list %}
-    <ul>
-        <li>{{business}}</li>
-    </ul>
-    {% endfor %}
+<div class="container">
+    <h2 class="title">Businesses That Match Your Interests</h2>
+
+    {% if business_list %}
+        <ul class="business-list">
+            {% for business in business_list %}
+                <li class="business-item">
+                    <span class="business-name">{{ business }}</span>
+
+                    <!-- Info Icon -->
+                    <div class="icons">
+                        <a href="#" class="chat-icon" title="Chat with {{ business }}">
+                            💬
+                        </a>
+                        <a href="#" class="info-icon" title="More info about {{ business }}" onclick="toggleDetails(event, 'details-{{ forloop.counter }}')">
+                            ℹ️
+                        </a>
+                    </div>
+
+                    <!-- Hidden Business Details -->
+                    <div class="business-details" id="details-{{ forloop.counter }}">
+                        <p><strong>Category:</strong> {{ business.business_category }}</p>
+                        <p><strong>Email:</strong> {{ business.business_email }}</p>
+                        <p><strong>Phone:</strong> {{ business.phone_number }}</p>
+                        <p><strong>Website:</strong> <a href="{{ business.website }}" target="_blank">{{ business.website }}</a></p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-results">No matching businesses found.</p>
+    {% endif %}
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .title {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .business-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .business-item {
+        background: #f4f4f4;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        font-size: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: 0.3s;
+        flex-wrap: wrap;
+    }
+
+    .business-item:hover {
+        background: #ddd;
+    }
+
+    .business-name {
+        flex: 1;
+        text-align: left;
+    }
+
+    .icons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .icons a {
+        text-decoration: none;
+        font-size: 20px;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+    .chat-icon {
+        color: #0084ff;
+    }
+
+    .chat-icon:hover {
+        color: #0056b3;
+    }
+
+    .info-icon {
+        color: #ff9900;
+    }
+
+    .info-icon:hover {
+        color: #cc7a00;
+    }
+
+    .business-details {
+        display: none;
+        width: 100%;
+        background: #e9e9e9;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .business-details a {
+        color: #0084ff;
+        text-decoration: none;
+    }
+
+    .business-details a:hover {
+        text-decoration: underline;
+    }
+
+    .no-results {
+        color: #777;
+        font-style: italic;
+    }
+</style>
+
+<script>
+    function toggleDetails(event, id) {
+        event.preventDefault();
+        let details = document.getElementById(id);
+        if (details.style.display === "none" || details.style.display === "") {
+            details.style.display = "block";
+        } else {
+            details.style.display = "none";
+        }
+    }
+</script>
+
 {% endblock content %}
