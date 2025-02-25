@@ -22,6 +22,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from .leaderboard import calculate_leaderboard,calculate_combined_leaderboard
 from django.contrib.auth.decorators import login_required
+from requests.exceptions import RequestException
 from dotenv import load_dotenv
 import os
 import secrets
