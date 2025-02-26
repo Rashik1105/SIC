@@ -44,7 +44,7 @@ import os
 import requests
 import time
 
-def fetch_x_metrics(x_id):
+def fetch_x_metrics(x_id, *args):
     access_token = os.getenv("X_BEARER_TOKEN")
 
     if not access_token:

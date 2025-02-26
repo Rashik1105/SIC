@@ -32,6 +32,7 @@ import json
 from celery.result import AsyncResult
 from .tasks import fetch_api_data_task
 from django.core.cache import cache
+from sic.tasks import fetch_api_data_task  # Import Celery task
 
 load_dotenv()
 # Configure Google OAuth
@@ -259,11 +260,12 @@ def dashboard(request):
             # Check Celery Task Status
             task_status = AsyncResult(task_id).status
 
-            if task_status == "PENDING" or task_status == "STARTED":
-                # If Celery is still running, return a loading message
+            if task_status in ["PENDING", "STARTED"]:
+                # Auto-refresh dashboard every 5 seconds while waiting for Celery
                 return render(request, "sic/dashboard.html", {
                     "user_type": "business",
-                    "loading_message": "Fetching latest leaderboard data..."
+                    "loading_message": "Fetching latest leaderboard data...",
+                    "auto_refresh": True  # Pass this variable to trigger auto-refresh
                 })
 
             elif task_status == "SUCCESS":
@@ -277,13 +279,14 @@ def dashboard(request):
                     })
                 else:
                     leaderboard_api = result  # Use API result if successful
-                    soretd_ids = [x["id"] for x in leaderboard_api if x["channel_category"] in [x.__str__() for x in interested_categories]]
-                    youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
+                    sorted_ids = [x["id"] for x in leaderboard_api if x["channel_category"] in [x.__str__() for x in interested_categories]]
+                    youtube_users = sorted(youtube_users, key=lambda x: sorted_ids.index(x.id) if x.id in sorted_ids else float('inf'))
 
                     return render(request, "sic/dashboard.html", {
                         "user_type": "business",
                         "youtube_users": youtube_users
                     })
+
             else:
                 return render(request, "sic/dashboard.html", {
                     "user_type": "business",

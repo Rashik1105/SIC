@@ -20,6 +20,14 @@
     {% endif %}
 </script>
 
+{% if auto_refresh %}
+<script>
+    setTimeout(function() {
+        location.reload();
+    }, 5000);  // Refresh every 5 seconds
+</script>
+{% endif %}
+
 {% endblock headcontent %}
 {% block content %}
 {% if user_type == "youtuber" %}
