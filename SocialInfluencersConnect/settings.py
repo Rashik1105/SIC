@@ -35,6 +35,18 @@ CORS_ALLOWED_ORIGINS = [
     "https://web-production-aa4a5.up.railway.app/",
 ]
 
+# Extend API request timeout
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    ),
+    'DEFAULT_TIMEOUT': 120,  # Increase request timeout to 120s
+}
+
+
 
 # Application definition
 
