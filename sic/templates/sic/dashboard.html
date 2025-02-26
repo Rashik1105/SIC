@@ -1,5 +1,26 @@
 {% extends "sic/base.html" %}
 {% block title %}YouTube Analytics Dashboard{% endblock %}
+{% block headcontent %}
+<script>
+    function checkTaskStatus() {
+        fetch("{% url 'check_task_status' %}")  // Call Django view to check Celery task status
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "SUCCESS") {
+                location.reload();  // Reload page when Celery finishes
+            } else {
+                setTimeout(checkTaskStatus, 5000);  // Retry in 5 seconds
+            }
+        })
+        .catch(error => console.error("Error checking task status:", error));
+    }
+
+    {% if loading_message %}
+        checkTaskStatus();  // Start checking if leaderboard is still loading
+    {% endif %}
+</script>
+
+{% endblock headcontent %}
 {% block content %}
 {% if user_type == "youtuber" %}
 <div class="container mt-5">

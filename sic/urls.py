@@ -19,5 +19,6 @@ urlpatterns = [
     path('dashboard', dashboard, name='dashboard'),
     path('logout', logout_view, name='logout'),
     path('leaderboard/', leaderboard_page, name='leaderboard_page'),
+    path("check-task-status/", check_task_status, name="check_task_status"),  # API to check Celery task
     path('accounts', include('allauth.urls')),  # Django-Allauth URLs
 ]

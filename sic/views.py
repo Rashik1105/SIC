@@ -31,6 +31,7 @@ import requests
 import json
 from celery.result import AsyncResult
 from .tasks import fetch_api_data_task
+from django.core.cache import cache
 
 load_dotenv()
 # Configure Google OAuth
@@ -249,40 +250,61 @@ def dashboard(request):
             # Fetchs Leaderboard from api
             # Build API URL
             api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))
-            task = fetch_api_data_task.delay(api_url)
+            task_id = cache.get("leaderboard_task_id")  
+            if not task_id:
+                task = fetch_api_data_task.delay(api_url)  # Start Celery task
+                cache.set("leaderboard_task_id", task.id, timeout=300)  # Cache task ID for 5 mins
+                task_id = task.id
+            
+            # Check Celery Task Status
+            task_status = AsyncResult(task_id).status
 
-            # Wait for Celery Task to Complete (Blocking)
-            result = AsyncResult(task.id).get(timeout=30)  # Blocking call
-            if isinstance(result, dict) and "error" in result:
-                print(f"Leaderboard API error: {result['error']}")
+            if task_status == "PENDING" or task_status == "STARTED":
+                # If Celery is still running, return a loading message
+                return render(request, "sic/dashboard.html", {
+                    "user_type": "business",
+                    "loading_message": "Fetching latest leaderboard data..."
+                })
+
+            elif task_status == "SUCCESS":
+                # Fetch leaderboard results
+                result = AsyncResult(task_id).get()
+                if isinstance(result, dict) and "error" in result:
+                    print(f"Leaderboard API error: {result['error']}")
+                    return render(request, "sic/dashboard.html", {
+                        "user_type": "business",
+                        "error": f"Error fetching leaderboard: {result['error']}"
+                    })
+                else:
+                    leaderboard_api = result  # Use API result if successful
+                    soretd_ids = [x["id"] for x in leaderboard_api if x["channel_category"] in [x.__str__() for x in interested_categories]]
+                    youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
+
+                    return render(request, "sic/dashboard.html", {
+                        "user_type": "business",
+                        "youtube_users": youtube_users
+                    })
             else:
-                leaderboard_api = result  # Use the API result if successful
-                print(leaderboard_api)
-                soretd_ids = [x["id"] for x in leaderboard_api if x["channel_category"] in [x.__str__() for x in interested_categories]]
-                youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
-            # if leaderboard_api.status_code == 200:
-            #     try:
-            #         leaderboard = json.loads(s=leaderboard_api.content)
-            #         soretd_ids = [x["id"] for x in leaderboard if x["channel_category"] in [x.__str__() for x in interested_categories]]
-            #         print(soretd_ids)
-            #         # Sorted out Youtube users according to leaderboard
-            #         youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
-            #         print(youtube_users)
-            #     except Exception as e:
-            #         JsonResponse({"error" : f"Unexpected error: {e}"})
-            # else:
-            #     print(f"Leaderboard API failed with status code {leaderboard_api.status_code}")
-
-            return render(request, "sic/dashboard.html", {
-                "user_type": "business",
-                "youtube_users": youtube_users
-            })
+                return render(request, "sic/dashboard.html", {
+                    "user_type": "business",
+                    "error": "Leaderboard data is currently unavailable. Please try again later."
+                })
         else:
             return render(request, "sic/dashboard.html", {"user_type": "unknown"})
     else:
         return HttpResponse("<h1>Sorry sign in !</h1>")
         
 
+def check_task_status(request):
+    """ API endpoint to check Celery task status """
+    task_id = cache.get("leaderboard_task_id")  # Get the Celery task ID from cache
+
+    if not task_id:
+        return JsonResponse({"status": "UNKNOWN"})  # No task running
+
+    task_status = AsyncResult(task_id).status  # Get Celery task status
+
+    return JsonResponse({"status": task_status})
 
 def logout_view(request):
     """ Logout the user and clear session """
