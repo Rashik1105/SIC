@@ -29,9 +29,8 @@ import hashlib
 import base64
 import requests
 import json
-import httpx
-import asyncio
-from asgiref.sync import async_to_sync
+from celery.result import AsyncResult
+from .tasks import fetch_api_data_task
 
 load_dotenv()
 # Configure Google OAuth
@@ -60,38 +59,40 @@ flow = Flow.from_client_config({
 }, scopes=SCOPES)
 
 
-async def fetch_api_data(request):
-    try:
-        api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))  # Namespaced URL
-        headers = {"Accept": "application/json"}
+# def fetch_api_data(request):
+#     try:
+#         # Build the full URL for the 'combined_leaderboard_api' in the 'apis' app
+#         api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))  # Namespaced URL
+#         headers = {"Accept": "application/json"}
 
-        # Use async client for non-blocking requests
-        async with httpx.AsyncClient() as client:
-            response = await client.get(api_url, headers=headers, timeout=30)
+#         # Fetch data from the API with a timeout
+#         response = requests.get(api_url, headers=headers , timeout=30)
 
-        response.raise_for_status()  # Raise exception for 4xx and 5xx responses
+#         # Handle HTTP errors (4xx, 5xx)
+#         response.raise_for_status()
 
-        try:
-            data = response.json()
-        except ValueError:
-            return JsonResponse({'error': 'Invalid JSON response from API'}, status=502)
+#         # Validate response JSON
+#         try:
+#             data = response.json()
+#         except ValueError:
+#             return JsonResponse({'error': 'Invalid JSON response from API'}, status=502)
 
-        if not isinstance(data, list):  # Ensure response is a list (leaderboard format)
-            return JsonResponse({'error': 'Unexpected API response format'}, status=502)
+#         if not isinstance(data, list):  # Ensure response is a list (leaderboard format)
+#             return JsonResponse({'error': 'Unexpected API response format'}, status=502)
 
-        return JsonResponse(data, safe=False)
+#         return JsonResponse(data, safe=False)
 
-    except httpx.TimeoutException:
-        return JsonResponse({'error': 'API request timed out'}, status=504)  # Gateway Timeout
+#     except Timeout:
+#         return JsonResponse({'error': 'API request timed out'}, status=504)  # Gateway Timeout
 
-    except httpx.RequestError as e:
-        return JsonResponse({'error': 'Failed to connect to API', 'details': str(e)}, status=503)  # Service Unavailable
+#     except ConnectionError:
+#         return JsonResponse({'error': 'Failed to connect to API'}, status=503)  # Service Unavailable
 
-    except httpx.HTTPStatusError as e:
-        return JsonResponse({'error': f'HTTP error {e.response.status_code}'}, status=e.response.status_code)
+#     except HTTPError as e:
+#         return JsonResponse({'error': f'HTTP error {e.response.status_code}'}, status=e.response.status_code)
 
-    except Exception as e:
-        return JsonResponse({'error': 'Unexpected error', 'details': str(e)}, status=500)
+#     except RequestException as e:
+#         return JsonResponse({'error': 'API request failed', 'details': str(e)}, status=502)  # Bad Gateway
 
 
 def home(request):
@@ -246,19 +247,31 @@ def dashboard(request):
             # Find YouTube users who belong to any of the interested categories
             youtube_users = YoutubeUser.objects.filter(channel_category__in=interested_categories)
             # Fetchs Leaderboard from api
-            leaderboard_api = async_to_sync(fetch_api_data)(request)
-            if leaderboard_api.status_code == 200:
-                try:
-                    leaderboard = json.loads(s=leaderboard_api.content)
-                    soretd_ids = [x["id"] for x in leaderboard if x["channel_category"] in [x.__str__() for x in interested_categories]]
-                    print(soretd_ids)
-                    # Sorted out Youtube users according to leaderboard
-                    youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
-                    print(youtube_users)
-                except Exception as e:
-                    JsonResponse({"error" : f"Unexpected error: {e}"})
+            # Build API URL
+            api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))
+            task = fetch_api_data_task.delay(api_url)
+
+            # Wait for Celery Task to Complete (Blocking)
+            result = AsyncResult(task.id).get(timeout=30)  # Blocking call
+            if isinstance(result, dict) and "error" in result:
+                print(f"Leaderboard API error: {result['error']}")
             else:
-                print(f"Leaderboard API failed with status code {leaderboard_api.status_code}")
+                leaderboard_api = result  # Use the API result if successful
+                print(leaderboard_api)
+                soretd_ids = [x["id"] for x in leaderboard_api if x["channel_category"] in [x.__str__() for x in interested_categories]]
+                youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
+            # if leaderboard_api.status_code == 200:
+            #     try:
+            #         leaderboard = json.loads(s=leaderboard_api.content)
+            #         soretd_ids = [x["id"] for x in leaderboard if x["channel_category"] in [x.__str__() for x in interested_categories]]
+            #         print(soretd_ids)
+            #         # Sorted out Youtube users according to leaderboard
+            #         youtube_users = sorted(youtube_users, key=lambda x: soretd_ids.index(x.id) if x.id in soretd_ids else float('inf'))
+            #         print(youtube_users)
+            #     except Exception as e:
+            #         JsonResponse({"error" : f"Unexpected error: {e}"})
+            # else:
+            #     print(f"Leaderboard API failed with status code {leaderboard_api.status_code}")
 
             return render(request, "sic/dashboard.html", {
                 "user_type": "business",
