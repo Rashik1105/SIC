@@ -24,13 +24,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY =os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*','6f94-2401-4900-8825-8345-bd63-fe81-2646-d6e9.ngrok-free.app', 'localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['https://web-production-aa4a5.up.railway.app/','https://6f94-2401-4900-8825-8345-bd63-fe81-2646-d6e9.ngrok-free.app']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+CORS_ALLOWED_ORIGINS = [
+    "https://web-production-aa4a5.up.railway.app/",
+]
 
 
 # Application definition
@@ -49,6 +52,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'sic.apps.SicConfig',
     'apis.apps.ApisConfig',
+    'corsheaders',
     'rest_framework',
 
 ]
@@ -63,6 +67,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "SocialInfluencersConnect.urls"

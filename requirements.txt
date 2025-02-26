@@ -98,6 +98,7 @@ yarl==1.18.3
 python-dotenv==1.0.1
 django-celery-beat
 djangorestframework
+django-cors-headers
 redis
 billiard
 werkzeug
