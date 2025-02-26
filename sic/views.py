@@ -461,28 +461,46 @@ def y_bussiness_lists(request):
 
 def leaderboard_page(request):
     try:
-        # Fetch the combined leaderboard API from the 'apis' app
-        api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))
-        headers = {"Accept": "application/json"}
-        response = requests.get(api_url, headers=headers , timeout=30)
-        response.raise_for_status()
-        
-        # Parse JSON response
-        try:
-            leaderboard_data = response.json()
-        except ValueError:
-            leaderboard_data = []
-            
-        # Highlight YouTube users in the leaderboard
-        for rank, influencer in enumerate(leaderboard_data, start=1):
-            influencer["rank"] = rank  # Add ranking position
-            influencer["is_youtube_user"] = influencer["user"] == request.user.youtubeuser.channel_name  # Mark YouTube users
+        # Build API URL
+        api_url = request.build_absolute_uri(reverse("combined_leaderboard_api"))
 
+        # Check if there's an existing task
+        task_id = cache.get("leaderboard_task_id")
+        if not task_id:
+            # Start a new Celery task
+            task = fetch_api_data_task.delay(api_url)
+            cache.set("leaderboard_task_id", task.id, timeout=300)  # Cache task ID for 5 mins
+            task_id = task.id
 
-        return render(request, 'sic/leaderboard.html', {"leaderboard": leaderboard_data})
+        # Check Celery Task Status
+        task_status = AsyncResult(task_id).status
 
-    except (Timeout, ConnectionError, HTTPError, RequestException):
-        return render(request, 'sic/leaderboard.html', {"leaderboard": [], "error": "Failed to fetch leaderboard."})
+        if task_status in ["PENDING", "STARTED"]:
+            # Return loading message while Celery task runs
+            return render(request, "sic/leaderboard.html", {"loading": True})
+
+        elif task_status == "SUCCESS":
+            # Fetch results from Celery
+            result = AsyncResult(task_id).get()
+            if isinstance(result, dict) and "error" in result:
+                return render(request, "sic/leaderboard.html", {"error": result["error"]})
+
+            leaderboard_data = result  # Use API result if successful
+            for rank, influencer in enumerate(leaderboard_data, start=1):
+                influencer["rank"] = rank  # Add ranking position
+                influencer["is_youtube_user"] = (
+                    request.user.is_authenticated
+                    and hasattr(request.user, "youtubeuser")
+                    and influencer["user"] == request.user.youtubeuser.channel_name
+                )
+
+            return render(request, "sic/leaderboard.html", {"leaderboard": leaderboard_data})
+
+        else:
+            return render(request, "sic/leaderboard.html", {"error": "Leaderboard data unavailable. Try again later."})
+
+    except Exception as e:
+        return render(request, "sic/leaderboard.html", {"error": f"Error: {str(e)}"})
     
     
     
