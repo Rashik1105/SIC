@@ -29,6 +29,9 @@ import hashlib
 import base64
 import requests
 import json
+import httpx
+import asyncio
+from asgiref.sync import async_to_sync
 
 load_dotenv()
 # Configure Google OAuth
@@ -57,19 +60,17 @@ flow = Flow.from_client_config({
 }, scopes=SCOPES)
 
 
-def fetch_api_data(request):
+async def fetch_api_data(request):
     try:
-        # Build the full URL for the 'combined_leaderboard_api' in the 'apis' app
         api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))  # Namespaced URL
         headers = {"Accept": "application/json"}
 
-        # Fetch data from the API with a timeout
-        response = requests.get(api_url, headers=headers , timeout=30)
+        # Use async client for non-blocking requests
+        async with httpx.AsyncClient() as client:
+            response = await client.get(api_url, headers=headers, timeout=30)
 
-        # Handle HTTP errors (4xx, 5xx)
-        response.raise_for_status()
+        response.raise_for_status()  # Raise exception for 4xx and 5xx responses
 
-        # Validate response JSON
         try:
             data = response.json()
         except ValueError:
@@ -80,17 +81,17 @@ def fetch_api_data(request):
 
         return JsonResponse(data, safe=False)
 
-    except Timeout:
+    except httpx.TimeoutException:
         return JsonResponse({'error': 'API request timed out'}, status=504)  # Gateway Timeout
 
-    except ConnectionError:
-        return JsonResponse({'error': 'Failed to connect to API'}, status=503)  # Service Unavailable
+    except httpx.RequestError as e:
+        return JsonResponse({'error': 'Failed to connect to API', 'details': str(e)}, status=503)  # Service Unavailable
 
-    except HTTPError as e:
+    except httpx.HTTPStatusError as e:
         return JsonResponse({'error': f'HTTP error {e.response.status_code}'}, status=e.response.status_code)
 
-    except RequestException as e:
-        return JsonResponse({'error': 'API request failed', 'details': str(e)}, status=502)  # Bad Gateway
+    except Exception as e:
+        return JsonResponse({'error': 'Unexpected error', 'details': str(e)}, status=500)
 
 
 def home(request):
@@ -245,7 +246,7 @@ def dashboard(request):
             # Find YouTube users who belong to any of the interested categories
             youtube_users = YoutubeUser.objects.filter(channel_category__in=interested_categories)
             # Fetchs Leaderboard from api
-            leaderboard_api = fetch_api_data(request=request)
+            leaderboard_api = async_to_sync(fetch_api_data)(request)
             if leaderboard_api.status_code == 200:
                 try:
                     leaderboard = json.loads(s=leaderboard_api.content)
