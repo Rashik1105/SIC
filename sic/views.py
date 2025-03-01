@@ -2,6 +2,7 @@ import os
 from django.contrib.auth.models import User                       
 from django.contrib.auth.forms import UserModel                       
 from .models import *
+from django.db.models import Q
 import uuid
 from django.contrib.auth.backends import ModelBackend 
 from django.contrib.auth import login, authenticate, logout
@@ -14,7 +15,7 @@ from django.forms import ModelForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import BusinessRegistrationForm
+from .forms import *
 from django.contrib import messages
 from django.contrib.auth.models import Group
 import requests
@@ -61,41 +62,6 @@ flow = Flow.from_client_config({
 }, scopes=SCOPES)
 
 
-# def fetch_api_data(request):
-#     try:
-#         # Build the full URL for the 'combined_leaderboard_api' in the 'apis' app
-#         api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))  # Namespaced URL
-#         headers = {"Accept": "application/json"}
-
-#         # Fetch data from the API with a timeout
-#         response = requests.get(api_url, headers=headers , timeout=30)
-
-#         # Handle HTTP errors (4xx, 5xx)
-#         response.raise_for_status()
-
-#         # Validate response JSON
-#         try:
-#             data = response.json()
-#         except ValueError:
-#             return JsonResponse({'error': 'Invalid JSON response from API'}, status=502)
-
-#         if not isinstance(data, list):  # Ensure response is a list (leaderboard format)
-#             return JsonResponse({'error': 'Unexpected API response format'}, status=502)
-
-#         return JsonResponse(data, safe=False)
-
-#     except Timeout:
-#         return JsonResponse({'error': 'API request timed out'}, status=504)  # Gateway Timeout
-
-#     except ConnectionError:
-#         return JsonResponse({'error': 'Failed to connect to API'}, status=503)  # Service Unavailable
-
-#     except HTTPError as e:
-#         return JsonResponse({'error': f'HTTP error {e.response.status_code}'}, status=e.response.status_code)
-
-#     except RequestException as e:
-#         return JsonResponse({'error': 'API request failed', 'details': str(e)}, status=502)  # Bad Gateway
-
 
 def home(request):
     return render(request, 'sic/home.html')
@@ -107,7 +73,7 @@ def youtube_login(request):
         return redirect("dashboard")
     flow.redirect_uri = GOOGLE_REDIRECT_URI
     # login_hint='aizenytchannel@gmail.com'
-    authorization_url, x = flow.authorization_url(prompt='consent', access_type='offline', include_granted_scopes='true',login_hint='aizenytchannel@gmail.com')
+    authorization_url, x = flow.authorization_url(prompt='consent', access_type='offline', include_granted_scopes='true')
     # print(authorization_url)
     return redirect(authorization_url)
 
@@ -182,6 +148,13 @@ def dashboard(request):
         
         headers = {"Authorization": f"Bearer {credentials['token']}"}
         
+        # ✅ Check Cache First
+        cache_key = f"youtube_dashboard_{request.user.id}"
+        cached_data = cache.get(cache_key)
+
+        if cached_data:
+            return render(request, 'sic/dashboard.html', cached_data)
+        
         # Fetch authenticated user's channel details to get the uploads playlist ID
         channel_url = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails,statistics&mine=true"
         channel_response = requests.get(channel_url, headers=headers)
@@ -234,6 +207,13 @@ def dashboard(request):
             
         # print(statistics)
         
+        # ✅ Cache Data for 10 Minutes
+        cache.set(cache_key, {
+            "user_type": "youtuber",
+            "channel": statistics,
+            "videos": video_list
+        }, timeout=600)
+        
         return render(request, 'sic/dashboard.html', {
             "user_type": "youtuber",
             "channel": statistics,
@@ -245,9 +225,23 @@ def dashboard(request):
         if hasattr(request.user, 'businessprofile'):
             business_profile = request.user.businessprofile
             interested_categories = business_profile.intrested_category.all()
+            
+            # ✅ Search Query
+            search_query = request.GET.get('search', '')
 
             # Find YouTube users who belong to any of the interested categories
-            youtube_users = YoutubeUser.objects.filter(channel_category__in=interested_categories)
+            # youtube_users = YoutubeUser.objects.filter(channel_category__in=interested_categories)
+            if search_query:
+                youtube_users = YoutubeUser.objects.filter(
+                Q(user__username__icontains=search_query) |  # Search by YouTube ID
+                Q(user__first_name__icontains=search_query) |  # Search by Channel Name (Full Name)
+                Q(user__last_name__icontains=search_query) |
+                Q(user__email__icontains=search_query) |  # Search by email
+                Q(owner_name__icontains=search_query) |
+                Q(channel_category__name__icontains=search_query) |
+                Q(keywords__icontains=search_query)).distinct()
+            else:
+                youtube_users = YoutubeUser.objects.filter(channel_category__in=interested_categories)
             # Fetchs Leaderboard from api
             # Build API URL
             api_url = request.build_absolute_uri(reverse('combined_leaderboard_api'))
@@ -284,7 +278,8 @@ def dashboard(request):
 
                     return render(request, "sic/dashboard.html", {
                         "user_type": "business",
-                        "youtube_users": youtube_users
+                        "youtube_users": youtube_users,
+                        "search_query": search_query
                     })
 
             else:
@@ -317,55 +312,77 @@ def logout_view(request):
 
 
 def bussiness_login_register(request):
-    login_form = AuthenticationForm()
-    register_form = BusinessRegistrationForm()
-
+    """
+    Handles business user login and registration via AJAX from the home page modals.
+    Expects an "action" field in POST data: "login" or "register".
+    """
     if request.method == "POST":
-        if "login" in request.POST:  # Handle login form submission
-            login_form = AuthenticationForm(data=request.POST)
-            if login_form.is_valid():
-                user = login_form.get_user()
-                
-                # ✅ Explicitly assign the authentication backend
+        action = request.POST.get("action")
+        
+        if action == "login":
+            # You can use username or email – here, we check for both.
+            username_or_email = request.POST.get("username")
+            password = request.POST.get("password")
+            user = authenticate(request, username=username_or_email, password=password)
+            if not user:
+                # If not authenticated by username, try email (assuming username field stores email too)
+                try:
+                    from django.contrib.auth import get_user_model
+                    User = get_user_model()
+                    user_obj = User.objects.get(email=username_or_email)
+                    user = authenticate(request, username=user_obj.username, password=password)
+                except User.DoesNotExist:
+                    pass
+
+            if user is not None:
+                # Explicitly assign the backend (using the first available backend)
                 backend = get_backends()[0]
                 user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
-
                 login(request, user)
-                return redirect("dashboard")  # Redirect to dashboard
-                
-        elif "register" in request.POST:  # Handle registration form submission
+                return JsonResponse({"success": True, "redirect_url": "/dashboard"})
+            else:
+                return JsonResponse({"success": False, "message": "Invalid login credentials."})
+        
+        elif action == "register":
             register_form = BusinessRegistrationForm(request.POST)
             if register_form.is_valid():
                 business_profile = register_form.save()
-                
-                # ✅ Add user to "BusinessUser" group
+                # Add the user to the BusinessUser group
                 business_group, created = Group.objects.get_or_create(name="BusinessUser")
                 business_profile.user.groups.add(business_group)
-
-                # ✅ Explicitly assign backend before login
+                # Assign backend explicitly
                 backend = get_backends()[0]
                 business_profile.user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
+                login(request, business_profile.user)
+                return JsonResponse({"success": True, "redirect_url": "/dashboard"})
+            else:
+                # Return form errors as JSON
+                return JsonResponse({"success": False, "errors": register_form.errors})
+    
+    # For GET requests, just render the home page
+    return render(request, "sic/home.html")
 
-                login(request, business_profile.user)  # Log in new user
-                return redirect("dashboard")  # Redirect to dashboard
 
-    return render(request, "sic/login.html", {
-        "login_form": login_form,
-        "register_form": register_form
-    })
-
+from django.core.cache import cache
+import os
 
 def youtube_user_detail(request, user_id):
-    """ Fetch YouTube User details and their latest 10 videos """
-    # Define API URLs (Replace placeholders with actual API endpoints)
+    """ Fetch YouTube User details and their latest 10 videos with caching """
+
+    # ✅ Try to get cached data
+    cache_key = f"youtube_user_detail_{user_id}"
+    cached_data = cache.get(cache_key)
+
+    if cached_data:
+        return render(request, "sic/youtube_user_detail.html", cached_data)
 
     youtube_user = YoutubeUser.objects.get(id=user_id)
 
     INSTAGRAM_API_URL = "https://graph.instagram.com/me/media"
     FACEBOOK_API_URL = "https://graph.facebook.com/v17.0/me/posts"
     X_API_URL = "https://api.twitter.com/2/users/{}/tweets"
-    
-    # Fetch channel statistics & country info
+
+    # ✅ Fetch YouTube Channel Data
     channel_url = "https://www.googleapis.com/youtube/v3/channels"
     channel_params = {
         "part": "snippet,statistics,brandingSettings",
@@ -373,7 +390,7 @@ def youtube_user_detail(request, user_id):
         "key": YOUTUBE_API_KEY,
     }
     channel_response = requests.get(channel_url, params=channel_params).json()
-    
+
     channel_info = channel_response.get("items", [{}])[0]  # Get first item safely
     statistics = channel_info.get("statistics", {})
     branding = channel_info.get("brandingSettings", {}).get("channel", {})
@@ -382,7 +399,7 @@ def youtube_user_detail(request, user_id):
     total_views = statistics.get("viewCount", "N/A")
     country = branding.get("country", "Unknown")
 
-    # Fetch last 10 videos from YouTube API
+    # ✅ Fetch Last 10 Videos
     search_url = "https://www.googleapis.com/youtube/v3/search"
     params = {
         "part": "snippet",
@@ -393,7 +410,7 @@ def youtube_user_detail(request, user_id):
         "key": YOUTUBE_API_KEY,
     }
     response = requests.get(search_url, params=params).json()
-    
+
     video_details = []
     if "items" in response:
         for item in response["items"]:
@@ -404,7 +421,7 @@ def youtube_user_detail(request, user_id):
             # Fetch video statistics
             stats_url = f"https://www.googleapis.com/youtube/v3/videos?part=statistics&id={video_id}&key={YOUTUBE_API_KEY}"
             stats_response = requests.get(stats_url).json()
-            stats = stats_response["items"][0]["statistics"]
+            stats = stats_response.get("items", [{}])[0].get("statistics", {})
 
             video_details.append({
                 "video_id": video_id,
@@ -414,31 +431,47 @@ def youtube_user_detail(request, user_id):
                 "likes": stats.get("likeCount", 0),
                 "comments": stats.get("commentCount", 0),
             })
-    # Fetch latest 5 Instagram posts
-    instagram_posts = []
-    if youtube_user.instagram_token:
-        insta_params = {"fields": "id,caption,media_type,media_url,permalink", "access_token": youtube_user.instagram_token, "limit": 5}
+
+    # ✅ Fetch Instagram Posts (Cache for 5 mins)
+    instagram_cache_key = f"instagram_posts_{user_id}"
+    instagram_posts = cache.get(instagram_cache_key)
+
+    if not instagram_posts and youtube_user.instagram_token:
+        insta_params = {
+            "fields": "id,caption,media_type,media_url,permalink",
+            "access_token": youtube_user.instagram_token,
+            "limit": 5
+        }
         insta_response = requests.get(INSTAGRAM_API_URL, params=insta_params).json()
-        if "data" in insta_response:
-            instagram_posts = insta_response["data"][:5]  # Limit to 5 posts
+        instagram_posts = insta_response.get("data", [])[:5]
+        cache.set(instagram_cache_key, instagram_posts, timeout=300)
 
-    # Fetch latest 5 Facebook posts
-    facebook_posts = []
-    if youtube_user.facebook_token:
-        fb_params = {"fields": "message,created_time,permalink_url", "access_token": youtube_user.facebook_token, "limit": 5}
+    # ✅ Fetch Facebook Posts (Cache for 5 mins)
+    facebook_cache_key = f"facebook_posts_{user_id}"
+    facebook_posts = cache.get(facebook_cache_key)
+
+    if not facebook_posts and youtube_user.facebook_token:
+        fb_params = {
+            "fields": "message,created_time,permalink_url",
+            "access_token": youtube_user.facebook_token,
+            "limit": 5
+        }
         fb_response = requests.get(FACEBOOK_API_URL, params=fb_params).json()
-        if "data" in fb_response:
-            facebook_posts = fb_response["data"][:5]
+        facebook_posts = fb_response.get("data", [])[:5]
+        cache.set(facebook_cache_key, facebook_posts, timeout=300)
 
-    # Fetch latest 5 X (Twitter) posts
-    x_posts = []
-    if youtube_user.x_token:
-        headers = {"Authorization": f"Bearer {os.getenv("X_BEARER_TOKEN")}"}
+    # ✅ Fetch X (Twitter) Posts (Cache for 5 mins)
+    x_cache_key = f"x_posts_{user_id}"
+    x_posts = cache.get(x_cache_key)
+
+    if not x_posts and youtube_user.x_token:
+        headers = {"Authorization": f"Bearer {os.getenv('X_BEARER_TOKEN')}"}
         x_response = requests.get(X_API_URL.format(youtube_user.x_id), headers=headers).json()
-        if "data" in x_response:
-            x_posts = x_response["data"][:5]
+        x_posts = x_response.get("data", [])[:5]
+        cache.set(x_cache_key, x_posts, timeout=300)
 
-    return render(request, "sic/youtube_user_detail.html", {
+    # ✅ Cache Everything for 10 Minutes
+    context = {
         "youtube_user": youtube_user,
         "total_subscribers": total_subscribers,
         "total_views": total_views,
@@ -447,15 +480,41 @@ def youtube_user_detail(request, user_id):
         "instagram_posts": instagram_posts,
         "facebook_posts": facebook_posts,
         "x_posts": x_posts
-    })
+    }
+
+    cache.set(cache_key, context, timeout=600)  # Cache for 10 minutes
+
+    return render(request, "sic/youtube_user_detail.html", context)
+
     
 def y_bussiness_lists(request):
     if request.user.groups.filter(name="YouTubeUser").exists():
         youtube_profile_category = request.user.youtubeuser.channel_category
-        business_list = BusinessProfile.objects.filter(intrested_category__in=[youtube_profile_category])
-        return render(request,'sic/business_list.html',{"business_list": business_list})
+
+        # ✅ Get search query from request
+        search_query = request.GET.get('search', '')
+
+        # # ✅ Base Query - Filter businesses based on interest category
+        # business_list = BusinessProfile.objects.filter(intrested_category__in=[youtube_profile_category])
+
+        # ✅ Apply search filters if query exists
+        if search_query:
+            business_list = BusinessProfile.objects.filter(
+                Q(business_name__icontains=search_query) |
+                Q(business_category__icontains=search_query) |
+                Q(business_email__icontains=search_query) |
+                Q(phone_number__icontains=search_query) |
+                Q(website__icontains=search_query)
+            ).distinct()
+        else:
+            business_list = BusinessProfile.objects.filter(intrested_category__in=[youtube_profile_category])
+
+        return render(request, 'sic/business_list.html', {
+            "business_list": business_list,
+            "search_query": search_query
+        })
     else:
-        return HttpResponse("<h1>Sorry your not Authenticated to access this page</h1>")
+        return HttpResponse("<h1>Sorry, you are not authorized to access this page.</h1>")
     
 
 
@@ -518,17 +577,36 @@ def link_meta(request):
 
 @login_required
 def profile(request):
-    """Profile page where users can link their social media accounts."""
-    
-    try:
-        youtube_user = YoutubeUser.objects.get(user=request.user)
-    except YoutubeUser.DoesNotExist:
-        youtube_user = None
+    """Profile page where users can view and edit their details."""
+
+    youtube_user = None
+    business_profile = None
+
+    if request.user.groups.filter(name="YouTubeUser").exists():
+        youtube_user = YoutubeUser.objects.filter(user=request.user).first()
+    elif request.user.groups.filter(name="BusinessUser").exists():
+        business_profile = BusinessProfile.objects.filter(user=request.user).first()
+
+    if request.method == "POST":
+        if youtube_user:
+            form = YoutubeUserForm(request.POST, instance=youtube_user)
+        elif business_profile:
+            form = BusinessProfileForm(request.POST, instance=business_profile)
+        else:
+            form = None
+        
+        if form and form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect("profile")
 
     context = {
         "youtube_user": youtube_user,
+        "business_profile": business_profile,
+        "youtube_form": YoutubeUserForm(instance=youtube_user) if youtube_user else None,
+        "business_form": BusinessProfileForm(instance=business_profile) if business_profile else None
     }
-    
+
     return render(request, "sic/profile.html", context)
 
 

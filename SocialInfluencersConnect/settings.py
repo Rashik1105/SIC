@@ -31,9 +31,9 @@ CSRF_TRUSTED_ORIGINS = ['https://web-production-aa4a5.up.railway.app/','https://
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-CORS_ALLOWED_ORIGINS = [
-    "https://web-production-aa4a5.up.railway.app/",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "https://web-production-aa4a5.up.railway.app/",
+# ]
 
 # Extend API request timeout
 REST_FRAMEWORK = {

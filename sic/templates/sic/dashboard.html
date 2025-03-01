@@ -66,24 +66,31 @@
     </div>
 {% endif %}
 {% if user_type == "business" %}
-    <div class="influencer-container">
-        <h2>📢 YouTube Influencers Matching Your Interests</h2>
+<div class="influencer-container">
+    <h2>📢 Find YouTube Influencers</h2>
 
-        {% if youtube_users %}
-            <ul class="influencer-list">
-                {% for yt_user in youtube_users %}
-                    <li class="influencer-item">
-                        <a href="{% url 'youtube_user_detail' yt_user.id %}" class="influencer-name">
-                            {{ yt_user.user.first_name }}
-                        </a>
-                        <span class="category"> - Category: {{ yt_user.channel_category.name }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="no-results">🚫 No matching YouTube influencers found.</p>
-        {% endif %}
-    </div>
+    <!-- Search Bar -->
+    <form method="GET" class="search-form">
+        <input type="text" name="search" placeholder="Search influencers..." value="{{ search_query }}">
+        <button type="submit">🔍 Search</button>
+    </form>
+
+    <!-- Influencer List -->
+    {% if youtube_users %}
+        <ul class="influencer-list">
+            {% for yt_user in youtube_users %}
+                <li class="influencer-item">
+                    <a href="{% url 'youtube_user_detail' yt_user.id %}" class="influencer-name">
+                        {{ yt_user.channel_name }}
+                    </a>
+                    <span class="category"> - Category: {{ yt_user.channel_category.name }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-results">🚫 No influencers found.</p>
+    {% endif %}
+</div>
 {% endif %}
 
 <style>
@@ -133,6 +140,33 @@
     .no-results {
         color: #888;
         font-style: italic;
+    }
+    .search-form {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+
+    .search-form input {
+        padding: 10px;
+        width: 250px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-right: 5px;
+    }
+
+    .search-form button {
+        padding: 10px 15px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .search-form button:hover {
+        background: #0056b3;
     }
     
 </style>

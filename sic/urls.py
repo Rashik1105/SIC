@@ -7,7 +7,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('', home, name='home'),
     path('login',youtube_login, name='youtube_login'),
-    path('login/bussiness',bussiness_login_register, name='bussiness_login'),
+    path('login/business-auth',bussiness_login_register, name='business_auth'),
     path('bussiness-list',y_bussiness_lists,name='bussiness-list'),
     path("youtube-user/<int:user_id>/", youtube_user_detail, name="youtube_user_detail"),
     path("profile/", profile, name="profile"),

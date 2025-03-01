@@ -2,127 +2,191 @@
 
 {% block content %}
 <div class="profile-container">
-    <h2 class="profile-heading">🎥 Profile Page</h2>
+    <h2 class="profile-heading">👤 Profile Page</h2>
 
-    <!-- Profile Details -->
+    <!-- Display Success Messages -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <p class="{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- YouTube User Profile -->
+    {% if youtube_user %}
     <div class="profile-card">
-        <h3 class="section-title">👤 Channel Information</h3>
-        <p><strong>📺 Channel Name:</strong> {{ youtube_user.channel_name }}</p>
-        <p><strong>📧 Channel Email:</strong> {{ youtube_user.user.email }}</p>
-        <p><strong>👑 Owner Name:</strong> {{ youtube_user.owner_name }}</p>
-        <p><strong>📞 Phone Number:</strong> {{ youtube_user.phone_number }}</p>
-        <p><strong>🏷️ Channel Category:</strong> {{ youtube_user.channel_category }}</p>
-        <p><strong>🔑 Channel Keywords:</strong> {{ youtube_user.getKeyWords|join:", " }}</p>
+        <h3 class="section-title">🎥 YouTube Profile</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ youtube_form.as_p }}
+            </div>
+            <button type="submit" class="save-btn">💾 Save Changes</button>
+        </form>
     </div>
 
-    <!-- Social Media Linking -->
     <div class="social-links">
         <h3 class="section-title">🔗 Link Social Media Accounts</h3>
+        <div class="social-buttons">
+            <div class="social-item">
+                {% if youtube_user.instagram_id %}
+                    ✅ <strong>Instagram Linked</strong>
+                {% else %}
+                    <a href="{% url 'link_meta' %}" class="link-button instagram">📷 Link Instagram</a>
+                {% endif %}
+            </div>
 
-        <div class="social-item">
-            {% if youtube_user.instagram_id %}
-                ✅ <strong>Instagram Linked</strong>
-            {% else %}
-                <a href="{% url 'link_meta' %}" class="link-button instagram">📷 Link Instagram</a>
-            {% endif %}
-        </div>
+            <div class="social-item">
+                {% if youtube_user.facebook_id %}
+                    ✅ <strong>Facebook Linked</strong>
+                {% else %}
+                    <a href="{% url 'link_meta' %}" class="link-button facebook">📘 Link Facebook</a>
+                {% endif %}
+            </div>
 
-        <div class="social-item">
-            {% if youtube_user.facebook_id %}
-                ✅ <strong>Facebook Linked</strong>
-            {% else %}
-                <a href="{% url 'link_meta' %}" class="link-button facebook">📘 Link Facebook</a>
-            {% endif %}
-        </div>
-
-        <div class="social-item">
-            {% if youtube_user.x_id %}
-                ✅ <strong>X (Twitter) Linked</strong>
-            {% else %}
-                <a href="{% url 'link_x' %}" class="link-button twitter">🐦 Link X (Twitter)</a>
-            {% endif %}
+            <div class="social-item">
+                {% if youtube_user.x_id %}
+                    ✅ <strong>X (Twitter) Linked</strong>
+                {% else %}
+                    <a href="{% url 'link_x' %}" class="link-button twitter">🐦 Link X (Twitter)</a>
+                {% endif %}
+            </div>
         </div>
     </div>
+    {% endif %}
+
+    <!-- Business Profile -->
+    {% if business_profile %}
+    <div class="profile-card">
+        <h3 class="section-title">🏢 Business Profile</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ business_form.as_p }}
+            </div>
+            <button type="submit" class="save-btn">💾 Save Changes</button>
+        </form>
+    </div>
+    {% endif %}
 </div>
 
 <style>
+    /* General Page Styling */
     .profile-container {
-        max-width: 600px;
+        max-width: 750px;
         margin: 40px auto;
         background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        font-family: 'Arial', sans-serif;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        font-family: 'Poppins', sans-serif;
+        animation: fadeIn 0.5s ease-in-out;
     }
     
     .profile-heading {
         text-align: center;
         color: #222;
-        font-size: 24px;
+        font-size: 28px;
         margin-bottom: 20px;
+        font-weight: 600;
     }
-    
+
+    /* Profile Card Styling */
     .profile-card {
         background: #f9f9f9;
-        padding: 15px;
-        border-radius: 8px;
+        padding: 20px;
+        border-radius: 10px;
         margin-bottom: 20px;
+        transition: 0.3s ease-in-out;
     }
-    
+
+    .profile-card:hover {
+        background: #f0f0f0;
+        transform: scale(1.02);
+    }
+
     .section-title {
-        font-size: 18px;
+        font-size: 20px;
         margin-bottom: 10px;
         color: #444;
         border-bottom: 2px solid #ddd;
         padding-bottom: 5px;
+        font-weight: 500;
     }
     
-    .profile-card p {
-        font-size: 16px;
-        line-height: 1.6;
-        color: #333;
-        margin: 8px 0;
-    }
-    
-    .social-links {
-        background: #f0f0f0;
-        padding: 15px;
-        border-radius: 8px;
-        text-align: center;
-    }
-    
-    .social-item {
+    form p {
         margin: 10px 0;
         font-size: 16px;
     }
+
+    /* Save Button */
+    .save-btn {
+        background: #28a745;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.3s;
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .save-btn:hover {
+        background: #218838;
+        transform: scale(1.05);
+    }
+
+    /* Social Media Links */
+    .social-links {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid #ddd;
+    }
+
+    .social-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
     
+    .social-item {
+        margin: 8px 0;
+        font-size: 16px;
+    }
+
     .link-button {
         display: inline-block;
-        padding: 8px 15px;
-        border-radius: 5px;
+        padding: 10px 18px;
+        border-radius: 8px;
         color: white;
         text-decoration: none;
-        font-weight: bold;
+        font-weight: 600;
+        transition: 0.3s;
     }
-    
-    .instagram {
-        background: #E1306C;
-    }
-    
-    .facebook {
-        background: #1877F2;
-    }
-    
-    .twitter {
-        background: #1DA1F2;
-    }
-    
+
+    .instagram { background: #E1306C; }
+    .facebook { background: #1877F2; }
+    .twitter { background: #1DA1F2; }
+
     .link-button:hover {
-        opacity: 0.8;
-    }    
+        opacity: 0.85;
+        transform: scale(1.05);
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
 </style>
-
 
 {% endblock %}
