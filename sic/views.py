@@ -34,6 +34,8 @@ from celery.result import AsyncResult
 from .tasks import fetch_api_data_task
 from django.core.cache import cache
 from sic.tasks import fetch_api_data_task  # Import Celery task
+from django.contrib.auth import get_user_model
+from django.db import transaction  # Ensures safe database operations
 
 load_dotenv()
 # Configure Google OAuth
@@ -318,6 +320,7 @@ def bussiness_login_register(request):
     """
     if request.method == "POST":
         action = request.POST.get("action")
+        print(action)
         
         if action == "login":
             # You can use username or email – here, we check for both.
@@ -327,11 +330,10 @@ def bussiness_login_register(request):
             if not user:
                 # If not authenticated by username, try email (assuming username field stores email too)
                 try:
-                    from django.contrib.auth import get_user_model
-                    User = get_user_model()
+                    user_model = get_user_model()
                     user_obj = User.objects.get(email=username_or_email)
                     user = authenticate(request, username=user_obj.username, password=password)
-                except User.DoesNotExist:
+                except user_model.DoesNotExist:
                     pass
 
             if user is not None:
@@ -344,27 +346,37 @@ def bussiness_login_register(request):
                 return JsonResponse({"success": False, "message": "Invalid login credentials."})
         
         elif action == "register":
+            print(request.POST)
             register_form = BusinessRegistrationForm(request.POST)
+            print(register_form.is_valid())
             if register_form.is_valid():
-                business_profile = register_form.save()
-                # Add the user to the BusinessUser group
-                business_group, created = Group.objects.get_or_create(name="BusinessUser")
-                business_profile.user.groups.add(business_group)
-                # Assign backend explicitly
-                backend = get_backends()[0]
-                business_profile.user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
-                login(request, business_profile.user)
-                return JsonResponse({"success": True, "redirect_url": "/dashboard"})
+                try:
+                    with transaction.atomic():  # Ensures atomicity
+                        business_profile = register_form.save()
+
+                        # Add user to BusinessUser group
+                        business_group, _ = Group.objects.get_or_create(name="BusinessUser")
+                        business_profile.user.groups.add(business_group)
+
+                        # Assign authentication backend explicitly
+                        backend = get_backends()[0]
+                        business_profile.user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
+
+                        # Log in user
+                        login(request, business_profile.user, backend="django.contrib.auth.backends.ModelBackend")
+
+                        return JsonResponse({"success": True, "redirect_url": "/dashboard"})
+
+                except Exception as e:
+                    return JsonResponse({"success": False, "errors": str(e)})
             else:
                 # Return form errors as JSON
+                print("Form Errors:", register_form.errors)
                 return JsonResponse({"success": False, "errors": register_form.errors})
     
     # For GET requests, just render the home page
     return render(request, "sic/home.html")
 
-
-from django.core.cache import cache
-import os
 
 def youtube_user_detail(request, user_id):
     """ Fetch YouTube User details and their latest 10 videos with caching """
