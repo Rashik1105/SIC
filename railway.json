@@ -6,7 +6,7 @@
         "buildCommand": "pip install -r requirements.txt"
       },
       "deploy": {
-        "startCommand": "daphne -b 0.0.0.0 -p $PORT SocialInfluencersConnect.asgi:application",
+        "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 180",
         "env": {
           "PYTHON_VERSION": "3.10"
         }
@@ -18,7 +18,7 @@
         "buildCommand": "pip install -r requirements.txt"
       },
       "deploy": {
-        "startCommand": "celery -A SocialInfluencersConnect worker --loglevel=info --pool=solo",
+        "startCommand": "celery -A SocialInfluencersCon nect worker --loglevel=info --pool=solo",
         "env": {
           "PYTHON_VERSION": "3.10"
         }
@@ -31,6 +31,18 @@
       },
       "deploy": {
         "startCommand": "celery -A SocialInfluencersConnect beat --loglevel=info",
+        "env": {
+          "PYTHON_VERSION": "3.10"
+        }
+      }
+    },
+    "channels": {
+      "build": {
+        "builder": "Nixpacks",
+        "buildCommand": "pip install -r requirements.txt"
+      },
+      "deploy": {
+        "startCommand": "daphne -b 0.0.0.0 -p $PORT SocialInfluencersConnect.asgi:application",
         "env": {
           "PYTHON_VERSION": "3.10"
         }
