@@ -84,6 +84,10 @@
                         {{ yt_user.channel_name }}
                     </a>
                     <span class="category"> - Category: {{ yt_user.channel_category.name }}</span>
+                    <!-- Chat Button -->
+                    <a href="{% url 'start_chat' yt_user.id %}" class="chat-btn" title="Chat with {{ yt_user.user.get_full_name }}">
+                        💬 Chat
+                    </a>
                 </li>
             {% endfor %}
         </ul>
@@ -167,6 +171,30 @@
 
     .search-form button:hover {
         background: #0056b3;
+    }
+    .chat-btn {
+        display: inline-block;
+        background: #28a745;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-left: 10px;
+        transition: background 0.3s;
+    }
+
+    .chat-btn:hover {
+        background: #1e7e34;
+    }
+
+    .badge {
+        background: red;
+        color: white;
+        padding: 3px 6px;
+        border-radius: 50%;
+        font-size: 12px;
+        margin-left: 5px;
     }
     
 </style>

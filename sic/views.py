@@ -2,7 +2,7 @@ import os
 from django.contrib.auth.models import User                       
 from django.contrib.auth.forms import UserModel                       
 from .models import *
-from django.db.models import Q
+from django.db.models import Q, Count
 import uuid
 from django.contrib.auth.backends import ModelBackend 
 from django.contrib.auth import login, authenticate, logout
@@ -769,3 +769,75 @@ def x_callback(request):
     youtube_user.save()
 
     return redirect("profile")
+
+# ----------------------------------------------------------------------
+# CHAT SET UPS
+# ----------------------------------------------------------------------
+@login_required
+def start_chat(request, user_id):
+    """
+    Start a chat between YouTubeUser and BusinessUser or fetch an existing chat.
+    """
+    if request.user.groups.filter(name="BusinessUser").exists():
+        business_profile = get_object_or_404(BusinessProfile, user=request.user)
+        youtube_user = get_object_or_404(YoutubeUser, id=user_id)
+        chat_room, created = ChatRoom.objects.get_or_create(
+            business_user=business_profile,
+            youtube_user=youtube_user
+        )
+    elif request.user.groups.filter(name="YouTubeUser").exists():
+        youtube_user = get_object_or_404(YoutubeUser, user=request.user)
+        business_profile = get_object_or_404(BusinessProfile, id=user_id)
+        chat_room, created = ChatRoom.objects.get_or_create(
+            youtube_user=youtube_user,
+            business_user=business_profile
+        )
+    else:
+        return HttpResponse("Unauthorized", status=403)
+
+    return redirect("chat_room", chat_id=chat_room.id)
+
+@login_required
+def chat_list(request):
+    """Displays all chat rooms of the logged-in user with unread message count."""
+    if request.user.groups.filter(name="BusinessUser").exists():
+        chat_rooms = ChatRoom.objects.filter(business_user__user=request.user)
+    elif request.user.groups.filter(name="YouTubeUser").exists():
+        chat_rooms = ChatRoom.objects.filter(youtube_user__user=request.user)
+    else:
+        return JsonResponse({"error": "Unauthorized"}, status=403)
+
+    # Fetch unread message counts
+    chat_rooms = chat_rooms.annotate(unread_count=Count("messages", filter=Q(messages__read=False)))
+
+    return render(request, "sic/chat_list.html", {"chat_rooms": chat_rooms})
+
+@login_required
+def chat_room(request, chat_id):
+    """Fetches chat messages in a chat room."""
+    chat_room = get_object_or_404(ChatRoom, id=chat_id)
+
+    # Mark messages as read
+    if request.user in [chat_room.business_user.user, chat_room.youtube_user.user]:
+        chat_room.messages.filter(read=False).exclude(sender=request.user).update(read=True)
+    if request.user.groups.filter(name="BusinessUser").exists():
+        message_to = chat_room.youtube_user.channel_name
+    elif request.user.groups.filter(name="YouTubeUser").exists():
+        message_to = chat_room.business_user.business_name
+    else:
+        return JsonResponse({"error": "Unauthorized"}, status=403)
+
+    return render(request, "sic/chat_room.html", {"chat_room": chat_room, "messages": chat_room.messages.all(), "message_to":message_to})
+
+@login_required
+def send_message(request, chat_id):
+    """Handles sending messages in a chat room via AJAX."""
+    if request.method == "POST":
+        chat_room = get_object_or_404(ChatRoom, id=chat_id)
+        message = request.POST.get("message", "").strip()
+
+        if message:
+            ChatMessage.objects.create(chat_room=chat_room, sender=request.user, message=message)
+            return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "Invalid request"})

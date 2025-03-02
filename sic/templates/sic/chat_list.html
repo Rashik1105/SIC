@@ -1,0 +1,18 @@
+{% extends "sic/base.html" %}
+{% block content %}
+<h2>💬 Your Conversations</h2>
+<ul class="chat-list">
+    {% for chat in chat_rooms %}
+        <li>
+            <a href="{% url 'chat_room' chat.id %}">
+                {{ chat.youtube_user.user.get_full_name }} - {{ chat.business_user.business_name }}
+                {% if chat.unread_count > 0 %}
+                    <span class="unread-badge">{{ chat.unread_count }}</span>
+                {% endif %}
+            </a>
+        </li>
+    {% empty %}
+        <p>No chats yet.</p>
+    {% endfor %}
+</ul>
+{% endblock %}

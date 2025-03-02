@@ -20,5 +20,9 @@ urlpatterns = [
     path('logout', logout_view, name='logout'),
     path('leaderboard/', leaderboard_page, name='leaderboard_page'),
     path("check-task-status/", check_task_status, name="check_task_status"),  # API to check Celery task
+    path("chat/start/<int:user_id>/", start_chat, name="start_chat"),
+    path("chat/", chat_list, name="chat_list"),
+    path("chat/<int:chat_id>/", chat_room, name="chat_room"),
+    path("chat/<int:chat_id>/send/", send_message, name="send_message"),
     path('accounts', include('allauth.urls')),  # Django-Allauth URLs
 ]

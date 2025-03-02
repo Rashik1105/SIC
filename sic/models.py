@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 from django.contrib.auth.models import User
 
 # Users & Profile.
@@ -98,3 +99,28 @@ class InfluencerMetrics(models.Model):
         self.likes = likes
         self.comments = comments
         self.save()
+        
+# Chats and Rooms
+class ChatRoom(models.Model):
+    """Represents a private chat room between a YouTubeUser and a BusinessProfile user."""
+    youtube_user = models.ForeignKey("YoutubeUser", on_delete=models.CASCADE, related_name="chat_rooms")
+    business_user = models.ForeignKey("BusinessProfile", on_delete=models.CASCADE, related_name="chat_rooms")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chat: {self.youtube_user.user.get_full_name()} ↔ {self.business_user.business_name}"
+    
+    def get_unread_count(self, user):
+        """Returns unread message count for a specific user."""
+        return self.messages.filter(read=False).exclude(sender=user).count()
+
+class ChatMessage(models.Model):
+    """Stores messages exchanged between users."""
+    chat_room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name="messages")
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(default=now)
+    read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Message by {self.sender.get_full_name()} at {self.timestamp}"

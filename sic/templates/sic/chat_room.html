@@ -1,0 +1,39 @@
+{% extends "sic/base.html" %}
+{% block content %}
+<h2>Chat with {{ message_to }}</h2>
+
+<div id="chat-messages">
+    {% for message in messages %}
+        <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+            <p>{{ message.message }}</p>
+            <small>{{ message.timestamp }}</small>
+        </div>
+    {% endfor %}
+</div>
+
+<input type="text" id="messageInput" placeholder="Type a message...">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+function sendMessage() {
+    let message = document.getElementById("messageInput").value;
+    fetch("{% url 'send_message' chat_room.id %}", {
+        method: "POST",
+        body: new URLSearchParams({"message": message}),
+        headers: {"X-CSRFToken": "{{ csrf_token }}", "Content-Type": "application/x-www-form-urlencoded"}
+    }).then(response => response.json()).then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+</script>
+
+<style>
+    #chat-messages { max-height: 400px; overflow-y: auto; padding: 10px; }
+    .message { padding: 8px; border-radius: 10px; margin: 5px 0; }
+    .sent { background-color: #0d6efd; color: white; text-align: right; }
+    .received { background-color: #e9ecef; color: black; text-align: left; }
+    .unread-badge { background-color: red; color: white; border-radius: 50%; padding: 3px 8px; font-size: 12px; }
+</style>
+{% endblock %}

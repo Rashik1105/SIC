@@ -1,10 +1,9 @@
 {% extends "sic/base.html" %}
-
 {% block content %}
 <div class="container">
     <h2 class="title">🔎 Search & Connect with Businesses</h2>
 
-    <!-- 🔍 Search Bar -->
+    <!-- Search Bar -->
     <form method="GET" class="search-form">
         <input type="text" name="search" placeholder="Search by name, category, email, etc." value="{{ search_query }}">
         <button type="submit">🔍 Search</button>
@@ -15,18 +14,18 @@
             {% for business in business_list %}
                 <li class="business-item">
                     <span class="business-name">{{ business.business_name }}</span>
-
-                    <!-- Icons for Actions -->
+                    <!-- Action Icons -->
                     <div class="icons">
-                        <a href="#" class="chat-icon" title="Chat with {{ business.business_name }}">
+                        <!-- Chat Button: redirects to start_chat view -->
+                        <a href="{% url 'start_chat' business.id %}" class="chat-icon" title="Chat with {{ business.business_name }}">
                             💬
                         </a>
+                        <!-- Info Button: toggles detailed info -->
                         <a href="#" class="info-icon" title="More info about {{ business.business_name }}" onclick="toggleDetails(event, 'details-{{ forloop.counter }}')">
                             ℹ️
                         </a>
                     </div>
-
-                    <!-- Business Details -->
+                    <!-- Hidden Business Details -->
                     <div class="business-details" id="details-{{ forloop.counter }}">
                         <p><strong>🏢 Category:</strong> {{ business.business_category }}</p>
                         <p><strong>📧 Email:</strong> <a href="mailto:{{ business.business_email }}">{{ business.business_email }}</a></p>
@@ -41,6 +40,7 @@
     {% endif %}
 </div>
 
+<!-- Styles -->
 <style>
     .container {
         max-width: 900px;
@@ -51,21 +51,18 @@
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         text-align: center;
     }
-
     .title {
         font-size: 26px;
         color: #333;
         margin-bottom: 20px;
         font-weight: bold;
     }
-
-    /* 🔍 Search Bar */
+    /* Search Bar */
     .search-form {
         display: flex;
         justify-content: center;
         margin-bottom: 20px;
     }
-
     .search-form input {
         width: 60%;
         padding: 10px;
@@ -74,7 +71,6 @@
         border-radius: 5px 0 0 5px;
         outline: none;
     }
-
     .search-form button {
         background: #007bff;
         color: white;
@@ -84,18 +80,15 @@
         border-radius: 0 5px 5px 0;
         font-size: 16px;
     }
-
     .search-form button:hover {
         background: #0056b3;
     }
-
-    /* 📌 Business List */
+    /* Business List */
     .business-list {
         list-style: none;
         padding: 0;
         margin-top: 10px;
     }
-
     .business-item {
         background: #f9f9f9;
         padding: 15px;
@@ -108,46 +101,36 @@
         transition: 0.3s;
         flex-wrap: wrap;
     }
-
     .business-item:hover {
         background: #ddd;
     }
-
     .business-name {
         flex: 1;
         font-weight: bold;
         text-align: left;
     }
-
     .icons {
         display: flex;
         gap: 15px;
     }
-
     .icons a {
         text-decoration: none;
         font-size: 22px;
         transition: 0.3s;
         cursor: pointer;
     }
-
     .chat-icon {
         color: #28a745;
     }
-
     .chat-icon:hover {
         color: #1e7e34;
     }
-
     .info-icon {
         color: #ff9900;
     }
-
     .info-icon:hover {
         color: #cc7a00;
     }
-
-    /* 🔽 Hidden Business Details */
     .business-details {
         display: none;
         width: 100%;
@@ -158,22 +141,20 @@
         font-size: 16px;
         text-align: left;
     }
-
     .business-details a {
         color: #007bff;
         text-decoration: none;
     }
-
     .business-details a:hover {
         text-decoration: underline;
     }
-
     .no-results {
         color: #777;
         font-style: italic;
     }
 </style>
 
+<!-- Scripts -->
 <script>
     function toggleDetails(event, id) {
         event.preventDefault();
@@ -181,5 +162,4 @@
         details.style.display = (details.style.display === "none" || details.style.display === "") ? "block" : "none";
     }
 </script>
-
-{% endblock content %}
+{% endblock %}
