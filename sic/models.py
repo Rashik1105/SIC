@@ -2,6 +2,8 @@ from django.db import models
 from django.utils.timezone import now
 from cryptography.fernet import Fernet
 from django.contrib.auth.models import User
+from django.conf import settings
+import os
 
 # Users & Profile.
 YOUTUBE_CHANNEL_CATEGORY = [
@@ -116,8 +118,10 @@ class ChatRoom(models.Model):
         return self.messages.filter(read=False).exclude(sender=user).count()
     
     
-SECRET_KEY = Fernet.generate_key()
-cipher = Fernet(SECRET_KEY)
+FERNET_SECRET_KEY = os.getenv("FERNET_SECRET_KEY")
+if not FERNET_SECRET_KEY:
+    raise Exception("FERNET_SECRET_KEY environment variable is not set!")
+cipher = Fernet(FERNET_SECRET_KEY)
 
 def encrypt_message(message):
     return cipher.encrypt(message.encode()).decode()
