@@ -6,7 +6,7 @@
         "buildCommand": "pip install -r requirements.txt"
       },
       "deploy": {
-        "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 180",
+        "startCommand": "daphne -b 0.0.0.0 -p $PORT SocialInfluencersConnect.asgi:application",
         "env": {
           "PYTHON_VERSION": "3.10"
         }

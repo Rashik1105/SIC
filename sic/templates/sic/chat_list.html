@@ -1,18 +1,63 @@
 {% extends "sic/base.html" %}
 {% block content %}
 <h2>💬 Your Conversations</h2>
+
 <ul class="chat-list">
     {% for chat in chat_rooms %}
         <li>
-            <a href="{% url 'chat_room' chat.id %}">
-                {{ chat.youtube_user.user.get_full_name }} - {{ chat.business_user.business_name }}
-                {% if chat.unread_count > 0 %}
-                    <span class="unread-badge">{{ chat.unread_count }}</span>
-                {% endif %}
+            <a href="{% url 'chat_room' chat.id %}" class="chat-link">
+                <div class="chat-info">
+                    <span class="chat-name">
+                        {{ chat.youtube_user.user.get_full_name }} - {{ chat.business_user.business_name }}
+                    </span>
+                    {% if chat.unread_count > 0 %}
+                        <span class="unread-badge">{{ chat.unread_count }}</span>
+                    {% endif %}
+                </div>
             </a>
         </li>
     {% empty %}
         <p>No chats yet.</p>
     {% endfor %}
 </ul>
+
+<style>
+    .chat-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 15px;
+    }
+
+    .chat-list li {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        transition: 0.3s;
+    }
+
+    .chat-list li:hover {
+        background: #f1f1f1;
+    }
+
+    .chat-link {
+        text-decoration: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .chat-name {
+        flex-grow: 1;
+    }
+
+    .unread-badge {
+        background: red;
+        color: white;
+        border-radius: 50%;
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+</style>
+
 {% endblock %}

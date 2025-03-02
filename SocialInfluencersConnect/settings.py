@@ -46,6 +46,22 @@ REST_FRAMEWORK = {
     'DEFAULT_TIMEOUT': 120,  # Increase request timeout to 120s
 }
 
+ASGI_APPLICATION = "SocialInfluencersConnect.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.getenv("CELERY_BROKER_URL")],  # Replace with Railway Redis URL
+        },
+    },
+}
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis for production
+#     },
+# }
 
 
 # Application definition
@@ -66,6 +82,7 @@ INSTALLED_APPS = [
     'apis.apps.ApisConfig',
     'corsheaders',
     'rest_framework',
+    'channels',
 
 ]
 

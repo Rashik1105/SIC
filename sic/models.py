@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
+from cryptography.fernet import Fernet
 from django.contrib.auth.models import User
 
 # Users & Profile.
@@ -113,6 +114,16 @@ class ChatRoom(models.Model):
     def get_unread_count(self, user):
         """Returns unread message count for a specific user."""
         return self.messages.filter(read=False).exclude(sender=user).count()
+    
+    
+SECRET_KEY = Fernet.generate_key()
+cipher = Fernet(SECRET_KEY)
+
+def encrypt_message(message):
+    return cipher.encrypt(message.encode()).decode()
+
+def decrypt_message(encrypted_message):
+    return cipher.decrypt(encrypted_message.encode()).decode()
 
 class ChatMessage(models.Model):
     """Stores messages exchanged between users."""
@@ -124,3 +135,10 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"Message by {self.sender.get_full_name()} at {self.timestamp}"
+    
+    def save(self, *args, **kwargs):
+        self.message = encrypt_message(self.message)
+        super().save(*args, **kwargs)
+
+    def get_message(self):
+        return decrypt_message(self.message)
