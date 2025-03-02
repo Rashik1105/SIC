@@ -28,6 +28,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         message = data.get('message')
         sender_id = self.scope['user'].id
+        print(f"Received message from user {sender_id}: {message}")  # Debug log
 
         # Save the message to the database asynchronously
         await self.save_message(sender_id, message)

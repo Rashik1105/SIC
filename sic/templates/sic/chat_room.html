@@ -5,7 +5,7 @@
 <div id="chat-messages">
     {% for message in messages %}
         <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
-            <p>{{ message.message }}</p>
+            <p>{{ message.get_message }}</p>
             <small>{{ message.timestamp|date:"H:i A" }}</small>
         </div>
     {% endfor %}
