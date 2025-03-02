@@ -96,6 +96,7 @@ web3==7.7.0
 websockets==13.1
 yarl==1.18.3
 python-dotenv==1.0.1
+daphne
 django-celery-beat
 djangorestframework
 django-cors-headers
