@@ -101,6 +101,8 @@ djangorestframework
 django-cors-headers
 redis
 asyncio
+channels
+channels-redis
 billiard
 werkzeug
 gunicorn
