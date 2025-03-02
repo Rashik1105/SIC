@@ -6,7 +6,7 @@ from django.core.asgi import get_asgi_application
 from sic.consumers import ChatConsumer
 
 websocket_urlpatterns = [
-    path("ws/chat/<int:chat_id>/", ChatConsumer.as_asgi()),
+    path("ws/chat/<str:chat_id>/", ChatConsumer.as_asgi()),
 ]
 
 application = ProtocolTypeRouter({

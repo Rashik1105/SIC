@@ -18,8 +18,9 @@
 
 <script>
 const chatSocket = new WebSocket(
-    "wss://" + window.location.host + "/ws/chat/{{ chat_room.id }}/"
+    "wss://" + "web-production-aa4a5.up.railway.app" + "/ws/chat/{{ chat_room.id }}/"
 );
+
 
 // 📌 Receive WebSocket Messages & Display
 chatSocket.onmessage = function(event) {
