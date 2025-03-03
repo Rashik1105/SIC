@@ -49,11 +49,17 @@
         }
         
         // Create WebSocket connection
-        // Critical fix: Check if we need HTTP upgrade for WebSockets
-        const wsScheme = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-        const wsHost ='tramway.proxy.rlwy.net:17713'
-        const wsPort = '8000'
-        const wsPath = `${wsScheme}${wsHost}:${wsPort}/ws/chat/${roomId}/`;
+        let wsPath;
+        
+        // Check if we're in production (on Railway)
+        if (window.location.hostname.includes('railway.app')) {
+            // Use the TCP proxy for Railway
+            wsPath = `wss://tramway.proxy.rlwy.net:17713/ws/chat/${roomId}/`;
+        } else {
+            // Local development
+            const wsScheme = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+            wsPath = `${wsScheme}${window.location.host}/ws/chat/${roomId}/`;
+        }
         
         console.log(`Connecting to WebSocket at ${wsPath}`);
         
