@@ -48,10 +48,20 @@
             connectionStatus.classList.remove('d-none');
         }
         
-        // WebSocket connection path
-        // Use direct TCP proxy URL with correct protocol (ws:// instead of wss://)
-        // Railway's TCP proxy doesn't support wss:// for direct connections
-        const wsPath = `ws://tramway.proxy.rlwy.net:17713/ws/chat/${roomId}/`;
+        // Determine the WebSocket connection path
+        // Use secure WebSocket (wss://) for production
+        // For Railway's TCP proxy, use secure wss:// since the page is loaded over HTTPS
+        const wsScheme = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        let wsPath;
+        
+        // For Railway deployment
+        if (window.location.hostname.includes('railway.app')) {
+            // Use the secure WebSocket protocol (wss://) with Railway TCP proxy
+            wsPath = `wss://tramway.proxy.rlwy.net:17713/ws/chat/${roomId}/`;
+        } else {
+            // Local development
+            wsPath = `${wsScheme}${window.location.host}/ws/chat/${roomId}/`;
+        }
         
         console.log(`Connecting to WebSocket at ${wsPath}`);
         
