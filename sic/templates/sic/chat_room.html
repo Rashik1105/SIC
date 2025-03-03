@@ -51,7 +51,9 @@
         // Create WebSocket connection
         // Critical fix: Check if we need HTTP upgrade for WebSockets
         const wsScheme = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-        const wsPath = `${wsScheme}${window.location.host}/ws/chat/${roomId}/`;
+        const wsHost ='tramway.proxy.rlwy.net:17713'
+        const wsPort = '8000'
+        const wsPath = `${wsScheme}${wsHost}:${wsPort}/ws/chat/${roomId}/`;
         
         console.log(`Connecting to WebSocket at ${wsPath}`);
         
