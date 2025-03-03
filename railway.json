@@ -8,8 +8,7 @@
       "deploy": {
         "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 180",
         "env": {
-          "PYTHON_VERSION": "3.10",
-          "CHANNELS_HOST": "tramway.proxy.rlwy.net:17713"
+          "PYTHON_VERSION": "3.10"
         }
       }
     },
