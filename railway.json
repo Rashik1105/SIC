@@ -18,7 +18,7 @@
         "buildCommand": "pip install -r requirements.txt"
       },
       "deploy": {
-        "startCommand": "celery -A SocialInfluencersCon nect worker --loglevel=info --pool=solo",
+        "startCommand": "celery -A SocialInfluencersConnect worker --loglevel=info --pool=solo",
         "env": {
           "PYTHON_VERSION": "3.10"
         }
@@ -44,9 +44,15 @@
       "deploy": {
         "startCommand": "daphne -b 0.0.0.0 -p $PORT SocialInfluencersConnect.asgi:application",
         "env": {
-          "PYTHON_VERSION": "3.10"
+          "PYTHON_VERSION": "3.10",
+          "RAILWAY_ENVIRONMENT": "production"
         }
-      }
+      },
+      "domains": [
+        {
+          "type": "PRIMARY"
+        }
+      ]
     }
   }
 }

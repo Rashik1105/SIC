@@ -3,8 +3,10 @@ from django.utils.timezone import now
 from cryptography.fernet import Fernet
 from django.contrib.auth.models import User
 from django.conf import settings
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 # Users & Profile.
 YOUTUBE_CHANNEL_CATEGORY = [
     ("NAN", "NAN"),
@@ -145,4 +147,9 @@ class ChatMessage(models.Model):
         super().save(*args, **kwargs)
 
     def get_message(self):
-        return decrypt_message(self.message)
+        try:
+            return decrypt_message(self.message)
+        except Exception as e:
+            # Log the error
+            print(f"Decryption error for message {self.id}: {e}")
+            return "[Decryption Error]"

@@ -48,11 +48,12 @@ REST_FRAMEWORK = {
 
 ASGI_APPLICATION = "SocialInfluencersConnect.asgi.application"
 
+# CHANNEL_LAYERS configuration - Use Redis for production
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.getenv("CELERY_BROKER_URL")],  # Replace with Railway Redis URL
+            "hosts": [os.getenv("CELERY_BROKER_URL")],
         },
     },
 }
@@ -62,6 +63,36 @@ CHANNEL_LAYERS = {
 #         "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis for production
 #     },
 # }
+
+# Make sure logging is properly configured
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'sic': {  # Your app name
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 
 
@@ -79,11 +110,11 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'channels',
     'sic.apps.SicConfig',
     'apis.apps.ApisConfig',
     'corsheaders',
     'rest_framework',
-    'channels',
 
 ]
 
