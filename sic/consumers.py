@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         # Get the user from the session (using authentication)
-        user = self.request.user
+        user = self.scope.get('user')
 
         # Check if user is authenticated
         if not user.is_authenticated:
