@@ -78,7 +78,7 @@
         // For Railway deployment
         if (window.location.hostname.includes('railway.app')) {
             // Pass user_id as query parameter for authentication
-            wsPath = `wss://web-production-aa4a5.up.railway.app/ws/chat/${roomId}/?user_id=${userId}`;
+            wsPath = `wss://channel-production-4729.up.railway.app/ws/chat/${roomId}/?user_id=${userId}`;
         } else {
             // Local development
             wsPath = `${wsScheme}${window.location.host}/ws/chat/${roomId}/?user_id=${userId}`;
