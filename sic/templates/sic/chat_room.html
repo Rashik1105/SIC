@@ -57,7 +57,7 @@
         // For Railway deployment
         if (window.location.hostname.includes('railway.app')) {
             // Use the secure WebSocket protocol (wss://) with Railway TCP proxy
-            wsPath = `wss://tramway.proxy.rlwy.net:17713/ws/chat/${roomId}/`;
+            wsPath = `wss://channel-production-4729.up.railway.app/ws/chat/${roomId}/`;
         } else {
             // Local development
             wsPath = `${wsScheme}${window.location.host}/ws/chat/${roomId}/`;
