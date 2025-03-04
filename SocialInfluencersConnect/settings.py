@@ -64,7 +64,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.getenv("CELERY_BROKER_URL")],
+            "hosts": [os.getenv("CELERY_BROKER_URL"),("tramway.proxy.rlwy.net", 17713)],
         },
     },
 }
