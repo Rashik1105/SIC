@@ -42,6 +42,10 @@ CORS_ALLOWED_ORIGINS = [
     "https://tramway.proxy.rlwy.net",
 ]
 
+# WebSocket settings for better connection stability
+WEBSOCKET_PING_INTERVAL = 20  # Send a ping every 20 seconds
+WEBSOCKET_PING_TIMEOUT = 30   # Wait 30 seconds for a pong response
+
 # Extend API request timeout
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
@@ -89,16 +93,18 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
+        # Add or update these loggers
+        'django.channels': {
             'handlers': ['console'],
             'level': 'INFO',
+            'propagate': False,
         },
-        'sic': {  # Your app name
+        'sic.consumers': {
             'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
+            'level': 'INFO',
+            'propagate': False,
         },
-    },
+    }
 }
 
 

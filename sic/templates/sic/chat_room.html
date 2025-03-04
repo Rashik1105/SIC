@@ -5,7 +5,7 @@
     
     <div id="chat-messages" class="mb-3">
         {% for message in messages %}
-            <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+            <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}" data-message-id="{{ message.id }}">
                 <p>{{ message.message }}</p>
                 <small>{{ message.timestamp|date:"H:i A" }}</small>
             </div>
@@ -35,6 +35,9 @@
     const messageSubmit = document.getElementById('chat-message-submit');
     const connectionStatus = document.getElementById('connection-status');
     
+    // Track processed messages to prevent duplicates
+    const processedMessages = new Set();
+    
     // Scroll to bottom of messages
     function scrollToBottom() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -46,8 +49,17 @@
     let reconnectAttempts = 0;
     let reconnectInterval = null;
     const maxReconnectAttempts = 5;
+    let isIntentionalClose = false;
     
     function connectWebSocket() {
+        // Close existing socket before creating a new one
+        if (chatSocket && chatSocket.readyState !== WebSocket.CLOSED) {
+            console.log('Closing existing WebSocket connection before reconnecting');
+            isIntentionalClose = true;
+            chatSocket.close();
+            isIntentionalClose = false;
+        }
+        
         // Clear any existing reconnect intervals
         if (reconnectInterval) {
             clearTimeout(reconnectInterval);
@@ -93,8 +105,26 @@
                 return;
             }
             
+            // Create a unique ID for the message 
+            const messageId = data.message_id || `${data.timestamp}-${data.username}-${data.message.substring(0, 10)}`;
+            
+            // Check if we've already processed this message or if it's already in the DOM
+            if (processedMessages.has(messageId) || document.querySelector(`[data-message-id="${messageId}"]`)) {
+                console.log('Duplicate message detected, ignoring:', messageId);
+                return;
+            }
+            
+            // Add to processed set (limit size to prevent memory issues)
+            processedMessages.add(messageId);
+            if (processedMessages.size > 100) {
+                // Remove oldest entries when we have too many
+                const iterator = processedMessages.values();
+                processedMessages.delete(iterator.next().value);
+            }
+            
             // Create message element
             const messageElement = document.createElement('div');
+            messageElement.setAttribute('data-message-id', messageId);
             messageElement.classList.add('message');
             
             if (data.username === username) {
@@ -118,10 +148,24 @@
             messageInput.disabled = true;
             messageSubmit.disabled = true;
             
+            // Don't reconnect if the close was intentional
+            if (isIntentionalClose || e.wasClean || document.visibilityState !== 'visible') {
+                console.log('Intentional close or clean close, not reconnecting');
+                if (!isIntentionalClose) {
+                    connectionStatus.innerHTML = 'Connection closed.';
+                    connectionStatus.classList.remove('d-none');
+                }
+                return;
+            }
+            
             if (reconnectAttempts < maxReconnectAttempts) {
                 reconnectAttempts++;
-                const delay = Math.min(1000 * reconnectAttempts, 5000);
+                // Exponential backoff with a longer initial delay
+                const delay = Math.min(2000 * Math.pow(1.5, reconnectAttempts-1), 10000);
                 console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts}) in ${delay}ms...`);
+                
+                connectionStatus.innerHTML = `Connection lost. Reconnecting in ${Math.round(delay/1000)} seconds...`;
+                connectionStatus.classList.remove('d-none');
                 
                 reconnectInterval = setTimeout(function() {
                     connectWebSocket();
@@ -152,15 +196,9 @@
             messageInput.value = '';
             messageInput.focus();
             
-            // Optionally add the message to the UI immediately for a more responsive feel
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', 'sent');
-            messageElement.innerHTML = `
-                <p>${message}</p>
-                <small>${new Date().toLocaleTimeString()}</small>
-            `;
-            chatMessages.appendChild(messageElement);
-            scrollToBottom();
+            // Note: We don't add the message to the UI here anymore
+            // We'll let the WebSocket onmessage handler handle all messages
+            // This prevents duplicates from manual addition + broadcast
         }
     }
     
@@ -189,6 +227,14 @@
         console.log('Internet connection restored, reconnecting WebSocket');
         reconnectAttempts = 0;
         connectWebSocket();
+    });
+    
+    // Prevent reconnection attempts when leaving the page
+    window.addEventListener('beforeunload', function() {
+        isIntentionalClose = true;
+        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.close();
+        }
     });
 </script>
 

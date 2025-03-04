@@ -1,15 +1,20 @@
 import json
+import uuid
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import ChatRoom, ChatMessage
 import logging
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    # Class variable to track recent messages
+    recent_messages = {}
+    
     async def connect(self):
         self.chat_id = self.scope['url_route']['kwargs']['chat_id']
         self.room_group_name = f'chat_{self.chat_id}'
@@ -81,21 +86,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
             text_data_json = json.loads(text_data)
             message = text_data_json['message']
             
+            # Generate a unique message ID
+            message_id = str(uuid.uuid4())
+            
             # Use self.user instead of self.scope['user']
             logger.info(f"Message received from user={self.user.username}: {message[:50]}...")
             
-            # Save the message to the database
+            # Save the message to the database FIRST
             saved_message = await self.save_message(message)
             
+            # Use the database ID as the message_id if possible
+            if saved_message and hasattr(saved_message, 'id'):
+                message_id = str(saved_message.id)
+            
             # Send message to room group
+            timestamp = saved_message.timestamp.strftime("%H:%M %p") if saved_message else datetime.now().strftime("%H:%M %p")
+            
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     'type': 'chat_message',
                     'message': message,
+                    'message_id': message_id,
                     'user_id': self.user.id,
                     'username': self.user.username,
-                    'timestamp': saved_message.timestamp.strftime("%H:%M %p") if saved_message else None
+                    'timestamp': timestamp
                 }
             )
         except Exception as e:
@@ -106,13 +121,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     async def chat_message(self, event):
         try:
+            # Extract message details
             message = event['message']
             username = event['username']
             timestamp = event['timestamp']
+            message_id = event.get('message_id', '')
             
-            # Send message to WebSocket
+            # No database operations here, just send the message
             await self.send(text_data=json.dumps({
                 'message': message,
+                'message_id': message_id,
                 'username': username,
                 'timestamp': timestamp
             }))
@@ -126,7 +144,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             chat_room = ChatRoom.objects.get(id=self.chat_id)
             chat_message = ChatMessage.objects.create(
                 chat_room=chat_room,
-                sender=self.user,  # Use self.user instead of self.scope['user']
+                sender=self.user,
                 message=message
             )
             return chat_message
