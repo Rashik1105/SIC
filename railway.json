@@ -8,7 +8,8 @@
       "deploy": {
         "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 180 & daphne -e ssl:${PORT}:privateKey=key.pem:certKey=cert.pem SocialInfluencersConnect.asgi:application",
         "env": {
-          "PYTHON_VERSION": "3.10"
+          "PYTHON_VERSION": "3.10",
+          "RAILWAY_ENVIRONMENT": "production"
         }
       }
     },
