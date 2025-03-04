@@ -42,7 +42,7 @@ load_dotenv()
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 # GOOGLE_REDIRECT_URI = 'http://127.0.0.1:8000/oauth2callback/'
-GOOGLE_REDIRECT_URI = 'https://web-production-aa4a5.up.railway.app/oauth2callback/'
+GOOGLE_REDIRECT_URI = 'https://socialinfluencersconnect-production.up.railway.app/oauth2callback/'
 YOUTUBE_API_KEY=os.getenv("YOUTUBE_API_KEY")
 SCOPES = [
     'https://www.googleapis.com/auth/youtube.readonly',
@@ -580,7 +580,7 @@ def leaderboard_page(request):
 def link_meta(request):
     META_CLIENT_ID = os.getenv("META_CLIENT_ID")
     # REDIRECT_URI = "http://127.0.0.1:8000/oauth/meta/callback/"
-    REDIRECT_URI = "https://web-production-aa4a5.up.railway.app/oauth/meta/callback/"
+    REDIRECT_URI = "https://socialinfluencersconnect-production.up.railway.app/oauth/meta/callback/"
 
     
     oauth_url = f"https://www.facebook.com/v18.0/dialog/oauth?client_id={META_CLIENT_ID}&redirect_uri={REDIRECT_URI}&scope=email,public_profile"
@@ -627,7 +627,7 @@ def meta_callback(request):
     META_CLIENT_ID = os.getenv("META_CLIENT_ID")
     META_CLIENT_SECRET = os.getenv("META_CLIENT_SECRET")
     # REDIRECT_URI = "http://127.0.0.1:8000/oauth/meta/callback/"
-    REDIRECT_URI = "https://web-production-aa4a5.up.railway.app/oauth/meta/callback/"
+    REDIRECT_URI = "https://socialinfluencersconnect-production.up.railway.app/oauth/meta/callback/"
 
     # Get authorization code from Meta
     code = request.GET.get("code")
@@ -666,7 +666,7 @@ def meta_callback(request):
 
 X_CLIENT_ID = os.getenv("X_CLIENT_ID")
 # X_REDIRECT_URI = "http://127.0.0.1:8000/oauth/x/callback/"
-X_REDIRECT_URI = "https://web-production-aa4a5.up.railway.app/oauth/x/callback/"
+X_REDIRECT_URI = "https://socialinfluencersconnect-production.up.railway.app/oauth/x/callback/"
 X_AUTH_URL = "https://twitter.com/i/oauth2/authorize"
 
 @login_required
@@ -704,7 +704,7 @@ def x_callback(request):
     X_CLIENT_ID = os.getenv("X_CLIENT_ID")
     X_CLIENT_SECRET = os.getenv("X_CLIENT_SECRET")
     # X_REDIRECT_URI = "http://127.0.0.1:8000/oauth/x/callback/"
-    X_REDIRECT_URI = "https://web-production-aa4a5.up.railway.app/oauth/x/callback/"
+    X_REDIRECT_URI = "https://socialinfluencersconnect-production.up.railway.app/oauth/x/callback/"
     X_TOKEN_URL = "https://api.twitter.com/2/oauth2/token"
 
     # Debugging: Print session and request data
