@@ -6,10 +6,10 @@
         "buildCommand": "pip install -r requirements.txt"
       },
       "deploy": {
-        "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 180 & daphne -e ssl:${PORT}:privateKey=key.pem:certKey=cert.pem SocialInfluencersConnect.asgi:application",
+        "startCommand": "gunicorn SocialInfluencersConnect.wsgi --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 180",
         "env": {
           "PYTHON_VERSION": "3.10",
-          "RAILWAY_ENVIRONMENT": "production"
+          "CHANNELS_HOST": "tramway.proxy.rlwy.net:17713"
         }
       }
     },
@@ -34,6 +34,19 @@
         "startCommand": "celery -A SocialInfluencersConnect beat --loglevel=info",
         "env": {
           "PYTHON_VERSION": "3.10"
+        }
+      }
+    },
+    "channels": {
+      "build": {
+        "builder": "Nixpacks",
+        "buildCommand": "pip install daphne[tls] -r requirements.txt"
+      },
+      "deploy": {
+        "startCommand": "daphne -e ssl:8000:privateKey=key.pem:certKey=cert.pem SocialInfluencersConnect.asgi:application",
+        "env": {
+          "PYTHON_VERSION": "3.10",
+          "RAILWAY_ENVIRONMENT": "production"
         }
       }
     }
