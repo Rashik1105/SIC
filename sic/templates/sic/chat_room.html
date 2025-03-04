@@ -23,9 +23,13 @@
 </div>
 
 {{ chat_room.id|json_script:"room-id" }}
+{{ request.user.id|json_script:"user-id" }}
+{{ request.user.username|json_script:"username" }}
 
 <script>
     const roomId = JSON.parse(document.getElementById('room-id').textContent);
+    const userId = JSON.parse(document.getElementById('user-id').textContent);
+    const username = JSON.parse(document.getElementById('username').textContent);
     const chatMessages = document.getElementById('chat-messages');
     const messageInput = document.getElementById('chat-message-input');
     const messageSubmit = document.getElementById('chat-message-submit');
@@ -40,31 +44,35 @@
     // WebSocket setup
     let chatSocket = null;
     let reconnectAttempts = 0;
+    let reconnectInterval = null;
     const maxReconnectAttempts = 5;
     
     function connectWebSocket() {
+        // Clear any existing reconnect intervals
+        if (reconnectInterval) {
+            clearTimeout(reconnectInterval);
+            reconnectInterval = null;
+        }
+        
         // Show connection status if reconnecting
         if (reconnectAttempts > 0) {
             connectionStatus.classList.remove('d-none');
         }
         
         // Determine the WebSocket connection path
-        // Use secure WebSocket (wss://) for production
-        // For Railway's TCP proxy, use secure wss:// since the page is loaded over HTTPS
         const wsScheme = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
         let wsPath;
         
         // For Railway deployment
         if (window.location.hostname.includes('railway.app')) {
-            // Use the secure WebSocket protocol (wss://) with Railway TCP proxy
-            wsPath = `wss://channel-production-4729.up.railway.app/ws/chat/${roomId}/`;
+            // Pass user_id as query parameter for authentication
+            wsPath = `wss://channel-production-4729.up.railway.app/ws/chat/${roomId}/?user_id=${userId}`;
         } else {
             // Local development
-            wsPath = `${wsScheme}${window.location.host}/ws/chat/${roomId}/`;
+            wsPath = `${wsScheme}${window.location.host}/ws/chat/${roomId}/?user_id=${userId}`;
         }
         
         console.log(`Connecting to WebSocket at ${wsPath}`);
-        const token = '{{ csrf_token }}';  
         
         chatSocket = new WebSocket(wsPath);
         
@@ -89,7 +97,7 @@
             const messageElement = document.createElement('div');
             messageElement.classList.add('message');
             
-            if (data.username === '{{ request.user.username }}') {
+            if (data.username === username) {
                 messageElement.classList.add('sent');
             } else {
                 messageElement.classList.add('received');
@@ -115,7 +123,7 @@
                 const delay = Math.min(1000 * reconnectAttempts, 5000);
                 console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts}) in ${delay}ms...`);
                 
-                setTimeout(function() {
+                reconnectInterval = setTimeout(function() {
                     connectWebSocket();
                 }, delay);
             } else {
@@ -143,6 +151,16 @@
             }));
             messageInput.value = '';
             messageInput.focus();
+            
+            // Optionally add the message to the UI immediately for a more responsive feel
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'sent');
+            messageElement.innerHTML = `
+                <p>${message}</p>
+                <small>${new Date().toLocaleTimeString()}</small>
+            `;
+            chatMessages.appendChild(messageElement);
+            scrollToBottom();
         }
     }
     
@@ -153,6 +171,24 @@
         if (e.key === 'Enter') {
             sendMessage();
         }
+    });
+    
+    // Handle page visibility changes to reconnect when user returns to the page
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            if (chatSocket === null || chatSocket.readyState !== WebSocket.OPEN) {
+                console.log('Page became visible, reconnecting WebSocket');
+                reconnectAttempts = 0;
+                connectWebSocket();
+            }
+        }
+    });
+    
+    // Reconnect if window regains internet connection
+    window.addEventListener('online', function() {
+        console.log('Internet connection restored, reconnecting WebSocket');
+        reconnectAttempts = 0;
+        connectWebSocket();
     });
 </script>
 

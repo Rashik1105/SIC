@@ -3,23 +3,53 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import ChatRoom, ChatMessage
 import logging
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)
+User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # Get the user from the session (using authentication)
-        user = self.scope.get('user')
-
-        # Check if user is authenticated
-        if not user.is_authenticated:
-            # Reject the connection if user is not authenticated
-            await self.close()
-            return
         self.chat_id = self.scope['url_route']['kwargs']['chat_id']
         self.room_group_name = f'chat_{self.chat_id}'
         
-        logger.info(f"WebSocket connect attempt: user={self.scope['user']}, chat_id={self.chat_id}")
+        # Get the user from the scope
+        user = self.scope.get('user', AnonymousUser())
+        
+        # Log connection attempt
+        logger.info(f"WebSocket connect attempt: user_auth_status={user.is_authenticated}, chat_id={self.chat_id}")
+        
+        # For production/Railway, we need to handle unauthenticated users differently
+        # because the channels service runs separately from the web service
+        if not user.is_authenticated:
+            # Instead of rejecting, try to get the user_id from query parameters
+            query_string = self.scope.get('query_string', b'').decode()
+            user_id = None
+            
+            # Parse the query string to get user_id
+            if query_string:
+                params = dict(param.split('=') for param in query_string.split('&') if '=' in param)
+                user_id = params.get('user_id')
+            
+            if user_id:
+                try:
+                    # Get the user by ID
+                    self.user = await self.get_user_by_id(int(user_id))
+                    logger.info(f"User authenticated from query param: user_id={user_id}")
+                except (ValueError, TypeError) as e:
+                    logger.error(f"Invalid user_id in query params: {str(e)}")
+                    await self.close()
+                    return
+            else:
+                logger.warning("User not authenticated and no user_id provided")
+                await self.close()
+                return
+        else:
+            self.user = user
+        
+        # Store user in self for later access
+        self.scope['user'] = self.user
         
         # Join room group
         await self.channel_layer.group_add(
@@ -28,10 +58,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
         
         await self.accept()
-        logger.info(f"WebSocket connection accepted: user={self.scope['user']}, chat_id={self.chat_id}")
+        logger.info(f"WebSocket connection accepted: user={self.user.username}, chat_id={self.chat_id}")
+    
+    @database_sync_to_async
+    def get_user_by_id(self, user_id):
+        try:
+            return User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return AnonymousUser()
     
     async def disconnect(self, close_code):
-        logger.info(f"WebSocket disconnect: user={self.scope['user']}, chat_id={self.chat_id}, code={close_code}")
+        logger.info(f"WebSocket disconnect: user={getattr(self, 'user', 'unknown')}, chat_id={self.chat_id}, code={close_code}")
         
         # Leave room group
         await self.channel_layer.group_discard(
@@ -44,7 +81,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             text_data_json = json.loads(text_data)
             message = text_data_json['message']
             
-            logger.info(f"Message received from user={self.scope['user']}: {message[:50]}...")
+            # Use self.user instead of self.scope['user']
+            logger.info(f"Message received from user={self.user.username}: {message[:50]}...")
             
             # Save the message to the database
             saved_message = await self.save_message(message)
@@ -55,8 +93,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 {
                     'type': 'chat_message',
                     'message': message,
-                    'user_id': self.scope['user'].id,
-                    'username': self.scope['user'].username,
+                    'user_id': self.user.id,
+                    'username': self.user.username,
                     'timestamp': saved_message.timestamp.strftime("%H:%M %p") if saved_message else None
                 }
             )
@@ -88,7 +126,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             chat_room = ChatRoom.objects.get(id=self.chat_id)
             chat_message = ChatMessage.objects.create(
                 chat_room=chat_room,
-                sender=self.scope['user'],
+                sender=self.user,  # Use self.user instead of self.scope['user']
                 message=message
             )
             return chat_message
