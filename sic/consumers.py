@@ -8,14 +8,6 @@ logger = logging.getLogger(__name__)
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # Get the user from the session (using authentication)
-        user = self.scope.get('user')
-
-        # Check if user is authenticated
-        if not user.is_authenticated:
-            # Reject the connection if user is not authenticated
-            await self.close()
-            return
         self.chat_id = self.scope['url_route']['kwargs']['chat_id']
         self.room_group_name = f'chat_{self.chat_id}'
         
