@@ -27,7 +27,7 @@ SECRET_KEY =os.getenv("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ['*','channel-production-4729.up.railway.app','6f94-2401-4900-8825-8345-bd63-fe81-2646-d6e9.ngrok-free.app', 'localhost', '127.0.0.1','tramway.proxy.rlwy.net', '.railway.app']
-CSRF_TRUSTED_ORIGINS = ['https://web-production-aa4a5.up.railway.app/','https://6f94-2401-4900-8825-8345-bd63-fe81-2646-d6e9.ngrok-free.app','https://tramway.proxy.rlwy.net',"https://channel-production-4729.up.railway.app",]
+CSRF_TRUSTED_ORIGINS = ['https://web-production-aa4a5.up.railway.app/',"https://socialinfluencersconnect-production.up.railway.app/"]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
@@ -38,8 +38,7 @@ SECURE_SSL_REDIRECT = True
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "https://web-production-aa4a5.up.railway.app",
-    "https://tramway.proxy.rlwy.net",
+    "https://socialinfluencersconnect-production.up.railway.app/",
 ]
 
 # WebSocket settings for better connection stability
@@ -64,7 +63,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.getenv("CELERY_BROKER_URL"),("tramway.proxy.rlwy.net", 17713)],
+            "hosts": [os.getenv("CELERY_BROKER_URL")],
         },
     },
 }
