@@ -827,7 +827,24 @@ def chat_room(request, chat_id):
     else:
         return JsonResponse({"error": "Unauthorized"}, status=403)
 
-    return render(request, "sic/chat_room.html", {"chat_room": chat_room, "messages": chat_room.messages.all(), "message_to":message_to})
+    # Fetch all messages and decrypt them efficiently
+    messages = chat_room.messages.all()
+    decrypted_messages = [
+        {
+            "id": message.id,
+            "sender": message.sender,
+            "message": message.get_message(),
+            "timestamp": message.timestamp,
+            "read": message.read
+        }
+        for message in messages
+    ]
+
+    return render(request, "sic/chat_room.html", {
+        "chat_room": chat_room,
+        "messages": decrypted_messages,
+        "message_to": message_to
+    })
 
 @login_required
 def send_message(request, chat_id):
