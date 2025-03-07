@@ -1,83 +1,220 @@
 {% extends 'sic/base.html' %}
-
-{% comment %} {% block title %}For Business - Social Influencers Connect{% endblock %} {% endcomment %}
 {% load static %}
 
 {% block headcontent %}
-{% comment %} <style>
+<style>
+    :root {
+        --primary-color: #0d6efd;
+        --primary-dark: #0b5ed7;
+        --primary-light: #83b8ff;
+        --text-dark: #293648;
+        --text-light: #64748b;
+        --bg-light: #f8fafc;
+        --box-bg: #ffffff;
+        --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        --border-radius: 12px;
+        --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    /* Modern Hero Section */
     .business-hero {
+        position: relative;
         text-align: center;
-        padding: 80px 5% 60px;
-        background: linear-gradient(180deg, var(--primary-bg) 0%, #e8f0fb 100%);
+        padding: 120px 5% 100px;
+        background: linear-gradient(135deg, #f8faff 0%, #e4ecf7 100%);
+        overflow: hidden;
+    }
+
+    .hero-bg-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .hero-shape {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(45deg, rgba(13, 110, 253, 0.1), rgba(131, 184, 255, 0.05));
+        animation: float 10s infinite ease-in-out;
+    }
+
+    .hero-shape:nth-child(1) {
+        width: 300px;
+        height: 300px;
+        top: -100px;
+        right: -50px;
+        animation-delay: 0s;
+    }
+
+    .hero-shape:nth-child(2) {
+        width: 200px;
+        height: 200px;
+        bottom: -50px;
+        left: 10%;
+        animation-delay: 1s;
+    }
+
+    .hero-shape:nth-child(3) {
+        width: 150px;
+        height: 150px;
+        top: 30%;
+        left: 20%;
+        animation-delay: 2s;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    .business-hero-content {
+        position: relative;
+        z-index: 2;
     }
 
     .business-hero h1 {
-        font-size: 48px;
+        font-size: clamp(36px, 5vw, 56px);
         font-weight: 800;
-        margin-bottom: 20px;
-        background: linear-gradient(90deg, #293648 0%, #0d6efd 100%);
+        margin-bottom: 25px;
+        background: linear-gradient(90deg, var(--text-dark) 0%, var(--primary-color) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        background-size: 200% auto;
-        animation: gradientSlide 6s ease infinite;
-    }
-
-    @keyframes gradientSlide {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        {% comment %} opacity: 0; {% endcomment %}
+        {% comment %} transform: translateY(350px); {% endcomment %}
+        animation: fadeInUp 0.8s forwards 0.2s;
     }
 
     .business-subtitle {
-        font-size: 20px;
+        font-size: clamp(18px, 2vw, 21px);
         max-width: 700px;
-        margin: 0 auto 40px;
+        margin: 0 auto 50px;
         color: var(--text-light);
+        line-height: 1.6;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.8s forwards 0.4s;
     }
 
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Modern CTA Button */
+    .cta-primary {
+        display: inline-block;
+        background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
+        color: white;
+        font-weight: 600;
+        padding: 16px 32px;
+        border-radius: 50px;
+        text-decoration: none;
+        box-shadow: 0 10px 20px rgba(13, 110, 253, 0.25);
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.8s forwards 0.6s;
+        z-index: 1;
+    }
+
+    .cta-primary:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary-color) 100%);
+        opacity: 0;
+        z-index: -1;
+        transition: var(--transition);
+    }
+
+    .cta-primary:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(13, 110, 253, 0.35);
+    }
+
+    .cta-primary:hover:before {
+        opacity: 1;
+    }
+
+    /* Animated Client Logos */
     .client-logos {
         display: flex;
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
         gap: 40px;
-        margin: 50px 0;
+        margin: 60px 0 0;
+        opacity: 0;
+        animation: fadeIn 1s forwards 0.8s;
     }
 
     .client-logo {
         height: 40px;
         filter: grayscale(100%);
         opacity: 0.7;
-        transition: all 0.3s ease;
+        transition: var(--transition);
     }
 
     .client-logo:hover {
         filter: grayscale(0%);
         opacity: 1;
-        transform: scale(1.1);
+        transform: scale(1.15);
     }
 
+    @keyframes fadeIn {
+        to { opacity: 1; }
+    }
+
+    /* Workflow Section Enhancements */
     .workflow-section {
-        padding: 100px 5%;
-        background-color: var(--primary-bg);
+        padding: 120px 5%;
+        background-color: var(--bg-light);
+        position: relative;
+        overflow: hidden;
     }
 
     .section-header {
         text-align: center;
         margin-bottom: 80px;
+        position: relative;
+    }
+
+    .section-header:after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        border-radius: 2px;
+        margin: 25px auto 0;
     }
 
     .section-header h2 {
-        font-size: 36px;
+        font-size: clamp(28px, 4vw, 40px);
         font-weight: 700;
         color: var(--text-dark);
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
 
     .section-header p {
         color: var(--text-light);
         max-width: 600px;
         margin: 0 auto;
+        font-size: 18px;
     }
 
     .workflow-steps {
@@ -87,91 +224,127 @@
         gap: 30px;
         max-width: 1200px;
         margin: 0 auto;
+        position: relative;
     }
 
     .workflow-step {
         flex: 1;
-        min-width: 250px;
+        min-width: 280px;
         max-width: 350px;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
         position: relative;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    .workflow-step:nth-child(1) { animation: stepFadeIn 0.6s forwards 0.2s; }
+    .workflow-step:nth-child(2) { animation: stepFadeIn 0.6s forwards 0.4s; }
+    .workflow-step:nth-child(3) { animation: stepFadeIn 0.6s forwards 0.6s; }
+    .workflow-step:nth-child(4) { animation: stepFadeIn 0.6s forwards 0.8s; }
+
+    @keyframes stepFadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .step-number {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
-        background-color: #0d6efd;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 28px;
         font-weight: 700;
         margin-bottom: 25px;
-        box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
+        box-shadow: 0 10px 25px rgba(13, 110, 253, 0.25);
         position: relative;
         z-index: 2;
+        transition: var(--transition);
     }
 
-    .workflow-step:not(:last-child)::after {
-        content: '';
+    .workflow-step:hover .step-number {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 15px 35px rgba(13, 110, 253, 0.35);
+    }
+
+    .workflow-connector {
         position: absolute;
-        top: 30px;
-        right: -15%;
-        width: 30%;
+        top: 35px;
+        left: calc(50% + 40px);
+        width: calc(100% - 80px);
         height: 3px;
-        background-color: #e0e6ed;
+        background: linear-gradient(90deg, rgba(13, 110, 253, 0.2), rgba(131, 184, 255, 0.2));
         z-index: 1;
     }
 
     .step-content {
         background-color: var(--box-bg);
         border-radius: var(--border-radius);
-        padding: 35px 25px 25px;
+        padding: 40px 30px 30px;
         box-shadow: var(--box-shadow);
-        margin-top: -30px;
+        margin-top: -35px;
         position: relative;
         z-index: 1;
-        height: calc(100% - 30px);
+        height: calc(100% - 35px);
         display: flex;
         flex-direction: column;
-        transition: transform 0.3s, box-shadow 0.3s;
+        transition: var(--transition);
+        border-top: 4px solid transparent;
     }
 
     .workflow-step:hover .step-content {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-15px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border-top: 4px solid var(--primary-color);
     }
 
     .step-content h3 {
-        margin-bottom: 15px;
+        margin: 15px 0;
         font-weight: 600;
+        color: var(--text-dark);
+        font-size: 22px;
+        transition: var(--transition);
+    }
+
+    .workflow-step:hover .step-content h3 {
+        color: var(--primary-color);
     }
 
     .step-content p {
         color: var(--text-light);
         flex-grow: 1;
+        line-height: 1.6;
     }
 
     .step-icon {
-        width: 60px;
-        height: 60px;
-        margin-bottom: 15px;
+        width: 70px;
+        height: 70px;
+        transition: var(--transition);
     }
 
+    .workflow-step:hover .step-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    /* Benefits Section Enhancements */
     .benefits-section {
-        padding: 100px 5%;
-        background-color: #f8fafc;
+        padding: 120px 5%;
+        background-color: #ffffff;
+        position: relative;
     }
 
     .benefits-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 50px;
+        gap: 60px;
         align-items: center;
         max-width: 1200px;
         margin: 0 auto;
@@ -183,56 +356,156 @@
         border-radius: var(--border-radius);
         box-shadow: var(--box-shadow);
         overflow: hidden;
+        position: relative;
+        opacity: 0;
+        transform: translateX(-30px);
+        animation: fadeInLeft 0.8s forwards 0.2s;
+    }
+
+    @keyframes fadeInLeft {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .benefits-image:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(131, 184, 255, 0));
+        z-index: 1;
+        opacity: 0;
+        transition: var(--transition);
+    }
+
+    .benefits-image:hover:before {
+        opacity: 1;
     }
 
     .benefits-image img {
         width: 100%;
         height: auto;
         display: block;
-        transition: transform 0.5s;
+        transition: var(--transition);
     }
 
     .benefits-image:hover img {
-        transform: scale(1.05);
+        transform: scale(1.05) rotate(-1deg);
     }
 
     .benefits-content {
         flex: 1;
         min-width: 300px;
+        opacity: 0;
+        transform: translateX(30px);
+        animation: fadeInRight 0.8s forwards 0.4s;
+    }
+
+    @keyframes fadeInRight {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 
     .benefits-content h2 {
-        font-size: 32px;
-        margin-bottom: 25px;
+        font-size: clamp(28px, 4vw, 36px);
+        margin-bottom: 40px;
         color: var(--text-dark);
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+    .benefits-content h2:after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        border-radius: 2px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
     }
 
     .benefit-item {
         display: flex;
-        margin-bottom: 30px;
+        margin-bottom: 35px;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .benefit-item:nth-child(2) { animation: benefitIn 0.6s forwards 0.6s; }
+    .benefit-item:nth-child(3) { animation: benefitIn 0.6s forwards 0.8s; }
+    .benefit-item:nth-child(4) { animation: benefitIn 0.6s forwards 1s; }
+    .benefit-item:nth-child(5) { animation: benefitIn 0.6s forwards 1.2s; }
+
+    @keyframes benefitIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .benefit-icon-container {
-        width: 50px;
-        height: 50px;
-        min-width: 50px;
-        background-color: rgba(13, 110, 253, 0.1);
-        border-radius: 12px;
+        width: 60px;
+        height: 60px;
+        min-width: 60px;
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(131, 184, 255, 0.05));
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 20px;
+        margin-right: 25px;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .benefit-icon-container:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(131, 184, 255, 0.1));
+        transform: translateY(100%);
+        transition: var(--transition);
+    }
+
+    .benefit-item:hover .benefit-icon-container:before {
+        transform: translateY(0);
     }
 
     .benefit-icon-container img {
-        width: 25px;
-        height: 25px;
+        width: 30px;
+        height: 30px;
+        transition: var(--transition);
+    }
+
+    .benefit-item:hover .benefit-icon-container {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .benefit-item:hover .benefit-icon-container img {
+        transform: scale(1.1);
     }
 
     .benefit-text h4 {
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         font-weight: 600;
         color: var(--text-dark);
+        font-size: 20px;
+        transition: var(--transition);
+    }
+
+    .benefit-item:hover .benefit-text h4 {
+        color: var(--primary-color);
     }
 
     .benefit-text p {
@@ -240,127 +513,17 @@
         line-height: 1.6;
     }
 
-    .pricing-section {
-        padding: 100px 5%;
-        background-color: var(--primary-bg);
-    }
-
-    .pricing-tiers {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 30px;
-        justify-content: center;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .pricing-tier {
-        flex: 1;
-        min-width: 300px;
-        max-width: 380px;
-        background-color: var(--box-bg);
-        border-radius: var(--border-radius);
-        padding: 40px;
-        box-shadow: var(--box-shadow);
-        transition: transform 0.3s, box-shadow 0.3s;
+    /* Testimonials Section Enhancements */
+    .testimonials-section {
+        padding: 120px 5%;
+        background-color: var(--bg-light);
         position: relative;
         overflow: hidden;
     }
 
-    .pricing-tier:hover {
-        transform: translateY(-15px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    }
-
-    .tier-popular {
-        position: absolute;
-        top: 20px;
-        right: -35px;
-        background-color: #0d6efd;
-        color: white;
-        padding: 8px 40px;
-        font-size: 14px;
-        transform: rotate(45deg);
-        font-weight: 600;
-    }
-
-    .tier-name {
-        font-size: 24px;
-        font-weight: 700;
-        margin-bottom: 15px;
-    }
-
-    .tier-price {
-        font-size: 48px;
-        font-weight: 800;
-        margin-bottom: 5px;
-        color: #0d6efd;
-    }
-
-    .tier-billing {
-        color: var(--text-light);
-        margin-bottom: 25px;
-    }
-
-    .tier-features {
-        margin-bottom: 30px;
-    }
-
-    .tier-feature {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 15px;
-    }
-
-    .feature-icon {
-        color: #0d6efd;
-        margin-right: 10px;
-        font-size: 20px;
-    }
-
-    .feature-text {
-        color: var(--text-dark);
-        line-height: 1.4;
-    }
-
-    .tier-cta {
-        display: block;
-        width: 100%;
-        padding: 15px;
-        background-color: #0d6efd;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.3s;
-        text-align: center;
-        text-decoration: none;
-    }
-
-    .tier-cta:hover {
-        background-color: #0b5ed7;
-        transform: translateY(-3px);
-    }
-
-    .tier-secondary {
-        background-color: transparent;
-        border: 2px solid #0d6efd;
-        color: #0d6efd;
-    }
-
-    .tier-secondary:hover {
-        background-color: rgba(13, 110, 253, 0.1);
-    }
-
-    .testimonials-section {
-        padding: 100px 5%;
-        background-color: #f8fafc;
-    }
-
     .testimonial-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 30px;
         max-width: 1200px;
         margin: 0 auto;
@@ -369,36 +532,65 @@
     .testimonial-card {
         background-color: var(--box-bg);
         border-radius: var(--border-radius);
-        padding: 30px;
+        padding: 40px;
         box-shadow: var(--box-shadow);
-        transition: transform 0.3s, box-shadow 0.3s;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeIn 0.8s forwards calc(0.2s * var(--card-index));
     }
 
     .testimonial-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-15px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+    }
+
+    .testimonial-card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: var(--transition);
+    }
+
+    .testimonial-card:hover:before {
+        transform: scaleX(1);
     }
 
     .testimonial-content {
         position: relative;
-        padding-left: 20px;
-        margin-bottom: 20px;
+        padding-left: 25px;
+        margin-bottom: 30px;
     }
 
     .testimonial-content::before {
         content: """;
         position: absolute;
-        left: -10px;
-        top: -20px;
-        font-size: 60px;
-        color: rgba(13, 110, 253, 0.2);
+        left: -15px;
+        top: -25px;
+        font-size: 80px;
+        color: rgba(13, 110, 253, 0.1);
         font-family: Georgia, serif;
+        transition: var(--transition);
+    }
+
+    .testimonial-card:hover .testimonial-content::before {
+        color: rgba(13, 110, 253, 0.2);
+        transform: translateY(-5px);
     }
 
     .testimonial-content p {
         font-style: italic;
         color: var(--text-dark);
-        line-height: 1.6;
+        line-height: 1.7;
+        font-size: 16px;
     }
 
     .testimonial-author {
@@ -407,17 +599,29 @@
     }
 
     .author-avatar {
-        width: 50px;
-        height: 50px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
-        margin-right: 15px;
+        margin-right: 20px;
         object-fit: cover;
+        border: 3px solid rgba(13, 110, 253, 0.1);
+        transition: var(--transition);
+    }
+
+    .testimonial-card:hover .author-avatar {
+        border-color: rgba(13, 110, 253, 0.3);
+        transform: scale(1.05);
     }
 
     .author-info h4 {
         margin: 0;
         color: var(--text-dark);
         font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .testimonial-card:hover .author-info h4 {
+        color: var(--primary-color);
     }
 
     .author-info p {
@@ -426,27 +630,76 @@
         font-size: 14px;
     }
 
+    /* CTA Section Enhancements */
     .cta-section {
         text-align: center;
-        padding: 100px 5%;
-        background: linear-gradient(135deg, #f2f5f8 0%, #e4ecf7 100%);
+        padding: 120px 5%;
+        background: linear-gradient(135deg, #f0f8ff 0%, #e0ecf9 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-bg-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .cta-shape {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(45deg, rgba(13, 110, 253, 0.08), rgba(131, 184, 255, 0.03));
+        animation: floatSlow 15s infinite ease-in-out;
+    }
+
+    .cta-shape:nth-child(1) {
+        width: 400px;
+        height: 400px;
+        top: -200px;
+        left: -100px;
+        animation-delay: 0s;
+    }
+
+    .cta-shape:nth-child(2) {
+        width: 300px;
+        height: 300px;
+        bottom: -150px;
+        right: -50px;
+        animation-delay: 2s;
+    }
+
+    @keyframes floatSlow {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-30px) rotate(5deg); }
     }
 
     .cta-content {
         max-width: 700px;
         margin: 0 auto;
+        position: relative;
+        z-index: 2;
     }
 
     .cta-content h2 {
-        font-size: 36px;
-        margin-bottom: 20px;
+        font-size: clamp(28px, 4vw, 40px);
+        margin-bottom: 25px;
         color: var(--text-dark);
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.8s forwards 0.2s;
     }
 
     .cta-content p {
-        margin-bottom: 40px;
+        margin-bottom: 50px;
         color: var(--text-light);
         font-size: 18px;
+        line-height: 1.6;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.8s forwards 0.4s;
     }
 
     .cta-buttons {
@@ -454,53 +707,104 @@
         justify-content: center;
         gap: 20px;
         flex-wrap: wrap;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.8s forwards 0.6s;
     }
 
     .cta-primary {
-        background: linear-gradient(90deg, #0d6efd 0%, #83b8ff 100%);
+        display: inline-block;
+        background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
         color: white;
         font-weight: 600;
-        padding: 15px 30px;
-        border-radius: 30px;
+        padding: 16px 40px;
+        border-radius: 50px;
         text-decoration: none;
-        box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
-        transition: transform 0.3s, box-shadow 0.3s;
+        box-shadow: 0 10px 25px rgba(13, 110, 253, 0.25);
+        transition: var(--transition);
         border: none;
         cursor: pointer;
         font-size: 16px;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .cta-primary:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-light) 0%, var(--primary-color) 100%);
+        opacity: 0;
+        z-index: -1;
+        transition: var(--transition);
     }
 
     .cta-primary:hover {
         transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(13, 110, 253, 0.3);
+        box-shadow: 0 15px 30px rgba(13, 110, 253, 0.35);
+    }
+
+    .cta-primary:hover:before {
+        opacity: 1;
     }
 
     .cta-secondary {
+        display: inline-block;
         background-color: white;
         color: var(--text-dark);
         font-weight: 600;
-        padding: 15px 30px;
-        border-radius: 30px;
+        padding: 16px 40px;
+        border-radius: 50px;
         text-decoration: none;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s, box-shadow 0.3s;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
         border: none;
         cursor: pointer;
         font-size: 16px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-secondary:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(13, 110, 253, 0.05);
+        opacity: 0;
+        transition: var(--transition);
     }
 
     .cta-secondary:hover {
         transform: translateY(-5px);
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        color: var(--primary-color);
     }
 
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .business-hero h1 {
-            font-size: 36px;
-        }
-        
-        .workflow-step:not(:last-child)::after {
+    .cta-secondary:hover:before {
+        opacity: 1;
+    }
+
+    /* Button Pulse Animation */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .pulse {
+        animation: pulse 0.4s ease-in-out;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+        .workflow-connector {
             display: none;
         }
         
@@ -508,313 +812,329 @@
             flex-direction: column;
         }
         
+        .benefits-image {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .business-hero {
+            padding: 80px 5% 70px;
+        }
+        
+        .workflow-step {
+            max-width: 100%;
+        }
+        
         .cta-buttons {
             flex-direction: column;
             align-items: center;
+            gap: 15px;
+        }
+        
+        .cta-primary, .cta-secondary {
+            width: 100%;
+            max-width: 300px;
         }
     }
-</style> {% endcomment %}
+</style>
 {% endblock %}
 
 {% block content %}
 <section class="business-section">
-<div class="business-hero">
-    <h1>Transform Your Marketing Strategy</h1>
-    <p class="business-subtitle">Connect with the perfect influencers for your brand, get actionable insights, and achieve measurable results with our data-driven platform.</p>
-    
-    <button class="cta-primary" id="business-demo-btn">Request a Demo</button>
-    
-    <div class="client-logos">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" class="client-logo">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg" alt="Samsung" class="client-logo">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" class="client-logo">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" class="client-logo">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" class="client-logo">
-    </div>
-</div>
-
-<div class="workflow-section">
-    <div class="section-header">
-        <h2>Our Simple 4-Step Process</h2>
-        <p>From discovery to results, we've streamlined influencer marketing to save you time and maximize ROI.</p>
-    </div>
-    
-    <div class="workflow-steps">
-        <div class="workflow-step">
-            <div class="step-number">1</div>
-            <div class="step-content">
-                <img src="https://cdn-icons-png.flaticon.com/512/2436/2436874.png" alt="Define" class="step-icon">
-                <h3>Define Your Campaign</h3>
-                <p>Set your goals, budget, and target audience. Our platform helps you craft campaign briefs that attract the right talent.</p>
-            </div>
+    <div class="business-hero">
+        <!-- Background shapes -->
+        <div class="hero-bg-shapes">
+            <div class="hero-shape"></div>
+            <div class="hero-shape"></div>
+            <div class="hero-shape"></div>
         </div>
         
-        <div class="workflow-step">
-            <div class="step-number">2</div>
-            <div class="step-content">
-                <img src="https://cdn-icons-png.flaticon.com/512/2791/2791226.png" alt="Discover" class="step-icon">
-                <h3>Discover Influencers</h3>
-                <p>Our AI matching algorithm suggests creators based on audience demographics, engagement quality, and brand alignment.</p>
-            </div>
-        </div>
-        
-        <div class="workflow-step">
-            <div class="step-number">3</div>
-            <div class="step-content">
-                <img src="https://cdn-icons-png.flaticon.com/512/4727/4727443.png" alt="Collaborate" class="step-icon">
-                <h3>Collaborate Seamlessly</h3>
-                <p>Manage contracts, briefs, content approval, and payments all in one platform with our streamlined workflow.</p>
-            </div>
-        </div>
-        
-        <div class="workflow-step">
-            <div class="step-number">4</div>
-            <div class="step-content">
-                <img src="https://cdn-icons-png.flaticon.com/512/6021/6021475.png" alt="Measure" class="step-icon">
-                <h3>Measure & Optimize</h3>
-                <p>Track performance metrics in real-time and get actionable insights to continuously improve your campaigns.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="benefits-section">
-    <div class="benefits-container">
-        <div class="benefits-image">
-            <img src="https://images.unsplash.com/photo-1537511446984-935f663eb1f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Business dashboard">
-        </div>
-        
-        <div class="benefits-content">
-            <h2>Why Businesses Choose SIC</h2>
+        <div class="business-hero-content">
+            <h1>Dominate Your Market Potential</h1>
+            <p class="business-subtitle">Connect with the perfect influencers for your brand, get actionable insights, and achieve measurable results with our data-driven platform.</p>
             
-            <div class="benefit-item">
-                <div class="benefit-icon-container">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4947/4947398.png" alt="Targeted">
-                </div>
-                <div class="benefit-text">
-                    <h4>Hyper-Targeted Audience Reach</h4>
-                    <p>Access influencers whose audiences perfectly match your target demographics, interests, and purchasing behaviors.</p>
+            {% comment %} <button class="cta-primary" id="business-demo-btn">Request a Demo</button> {% endcomment %}
+            
+            <div class="client-logos">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" class="client-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg" alt="Samsung" class="client-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" class="client-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" class="client-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" class="client-logo">
+            </div>
+        </div>
+    </div>
+
+    <div class="workflow-section">
+        <div class="section-header">
+            <h2>Our Simple 4-Step Process</h2>
+            <p>From discovery to results, we've streamlined influencer marketing to save you time and maximize ROI.</p>
+        </div>
+        
+        <div class="workflow-steps">
+            <div class="workflow-step">
+                <div class="step-number">1</div>
+                <div class="workflow-connector"></div>
+                <div class="step-content">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2436/2436874.png" alt="Define" class="step-icon">
+                    <h3>Define Your Campaign</h3>
+                    <p>Set your goals, budget, and target audience. Our platform helps you craft campaign briefs that attract the right talent.</p>
                 </div>
             </div>
             
-            <div class="benefit-item">
-                <div class="benefit-icon-container">
-                    <img src="https://cdn-icons-png.flaticon.com/512/9329/9329983.png" alt="Data">
-                </div>
-                <div class="benefit-text">
-                    <h4>Data-Driven Decision Making</h4>
-                    <p>Leverage comprehensive analytics to select influencers based on authentic engagement, not just follower counts.</p>
-                </div>
-            </div>
-            
-            <div class="benefit-item">
-                <div class="benefit-icon-container">
-                    <img src="https://cdn-icons-png.flaticon.com/512/5956/5956592.png" alt="Automation">
-                </div>
-                <div class="benefit-text">
-                    <h4>Workflow Automation</h4>
-                    <p>Save 70% of administrative time with our end-to-end campaign management tools and templates.</p>
+            <div class="workflow-step">
+                <div class="step-number">2</div>
+                <div class="workflow-connector"></div>
+                <div class="step-content">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2791/2791226.png" alt="Discover" class="step-icon">
+                    <h3>Discover Influencers</h3>
+                    <p>Our AI matching algorithm suggests creators based on audience demographics, engagement quality, and brand alignment.</p>
                 </div>
             </div>
             
-            <div class="benefit-item">
-                <div class="benefit-icon-container">
-                    <img src="https://cdn-icons-png.flaticon.com/512/6213/6213450.png" alt="ROI">
+            <div class="workflow-step">
+                <div class="step-number">3</div>
+                <div class="workflow-connector"></div>
+                <div class="step-content">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4727/4727443.png" alt="Collaborate" class="step-icon">
+                    <h3>Collaborate Seamlessly</h3>
+                    <p>Manage contracts, briefs, content approval, and payments all in one platform with our streamlined workflow.</p>
                 </div>
-                <div class="benefit-text">
-                    <h4>Proven ROI</h4>
-                    <p>Our clients see an average of 11x return on investment through our optimized influencer selection and campaign strategies.</p>
+            </div>
+            
+            <div class="workflow-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <img src="https://cdn-icons-png.flaticon.com/512/6021/6021475.png" alt="Measure" class="step-icon">
+                    <h3>Measure & Optimize</h3>
+                    <p>Track performance metrics in real-time and get actionable insights to continuously improve your campaigns.</p>
+                </div>
+            </div>
+        </div>
+    </div><div class="benefits-section">
+        <div class="benefits-container">
+            <div class="benefits-image">
+                <img src="https://images.unsplash.com/photo-1537511446984-935f663eb1f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Business dashboard">
+            </div>
+            
+            <div class="benefits-content">
+                <h2>Why Businesses Choose SIC</h2>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon-container">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4947/4947398.png" alt="Targeted">
+                    </div>
+                    <div class="benefit-text">
+                        <h4>Hyper-Targeted Audience Reach</h4>
+                        <p>Access influencers whose audiences perfectly match your target demographics, interests, and purchasing behaviors.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon-container">
+                        <img src="https://cdn-icons-png.flaticon.com/512/9329/9329983.png" alt="Data">
+                    </div>
+                    <div class="benefit-text">
+                        <h4>Data-Driven Decision Making</h4>
+                        <p>Leverage comprehensive analytics to select influencers based on authentic engagement, not just follower counts.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon-container">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5956/5956592.png" alt="Automation">
+                    </div>
+                    <div class="benefit-text">
+                        <h4>Workflow Automation</h4>
+                        <p>Save 70% of administrative time with our end-to-end campaign management tools and templates.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon-container">
+                        <img src="https://cdn-icons-png.flaticon.com/512/6213/6213450.png" alt="ROI">
+                    </div>
+                    <div class="benefit-text">
+                        <h4>Proven ROI</h4>
+                        <p>Our clients see an average of 11x return on investment through our optimized influencer selection and campaign strategies.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-
-<div class="testimonials-section">
-    <div class="section-header">
-        <h2>What Our Clients Say</h2>
-        <p>Join hundreds of businesses that have transformed their influencer marketing with SIC.</p>
-    </div>
-    
-    <div class="testimonial-grid">
-        <div class="testimonial-card">
-            <div class="testimonial-content">
-                <p>"SIC revolutionized how we approach influencer marketing. We've seen a 3x increase in engagement and a significant boost in conversions since we started using the platform."</p>
-            </div>
-            <div class="testimonial-author">
-                <img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Sarah Johnson" class="author-avatar">
-                <div class="author-info">
-                    <h4>Sarah Johnson</h4>
-                    <p>Marketing Director, TechGlobal</p>
-                </div>
-            </div>
+    <div class="testimonials-section">
+        <div class="section-header">
+            <h2>What Our Clients Say</h2>
+            <p>Join hundreds of businesses that have transformed their influencer marketing with SIC.</p>
         </div>
         
-        <div class="testimonial-card">
-            <div class="testimonial-content">
-                <p>"The data insights we get from SIC help us make informed decisions about which influencers to work with. No more guesswork—just measurable results."</p>
-            </div>
-            <div class="testimonial-author">
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Michael Chen" class="author-avatar">
-                <div class="author-info">
-                    <h4>Michael Chen</h4>
-                    <p>CMO, FitLifestyle</p>
+        <div class="testimonial-grid">
+            <div class="testimonial-card" style="--card-index: 1">
+                <div class="testimonial-content">
+                    <p>"SIC revolutionized how we approach influencer marketing. We've seen a 3x increase in engagement and a significant boost in conversions since we started using the platform."</p>
+                </div>
+                <div class="testimonial-author">
+                    <img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Sarah Johnson" class="author-avatar">
+                    <div class="author-info">
+                        <h4>Sarah Johnson</h4>
+                        <p>Marketing Director, TechGlobal</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="testimonial-card">
-            <div class="testimonial-content">
-                <p>"As a small business, we were hesitant about influencer marketing. SIC made it accessible and effective. The ROI speaks for itself—best marketing decision we've made."</p>
+            
+            <div class="testimonial-card" style="--card-index: 2">
+                <div class="testimonial-content">
+                    <p>"The data insights we get from SIC help us make informed decisions about which influencers to work with. No more guesswork—just measurable results."</p>
+                </div>
+                <div class="testimonial-author">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Michael Chen" class="author-avatar">
+                    <div class="author-info">
+                        <h4>Michael Chen</h4>
+                        <p>CMO, FitLifestyle</p>
+                    </div>
+                </div>
             </div>
-            <div class="testimonial-author">
-                <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Jessica Torres" class="author-avatar">
-                <div class="author-info">
-                    <h4>Jessica Torres</h4>
-                    <p>Founder, Artisan Goods Co.</p>
+            
+            <div class="testimonial-card" style="--card-index: 3">
+                <div class="testimonial-content">
+                    <p>"As a small business, we were hesitant about influencer marketing. SIC made it accessible and effective. The ROI speaks for itself—best marketing decision we've made."</p>
+                </div>
+                <div class="testimonial-author">
+                    <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Jessica Torres" class="author-avatar">
+                    <div class="author-info">
+                        <h4>Jessica Torres</h4>
+                        <p>Founder, Artisan Goods Co.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="cta-section">
-    <div class="cta-content">
-        <h2>Ready to Transform Your Influencer Marketing?</h2>
-        <p>Join leading brands leveraging data-driven influencer campaigns to drive growth and authentic connections.</p>
+    <div class="cta-section">
+        <!-- Background shapes -->
+        <div class="cta-bg-shapes">
+            <div class="cta-shape"></div>
+            <div class="cta-shape"></div>
+        </div>
         
-        <div class="cta-buttons">
-            <button class="cta-primary" id="business-signup-btn">Start Today</button>
-            <button class="cta-secondary" id="schedule-demo-btn">Schedule a Demo</button>
+        <div class="cta-content">
+            <h2>Ready to Transform Your Influencer Marketing?</h2>
+            <p>Join leading brands leveraging data-driven influencer campaigns to drive growth and authentic connections.</p>
+            
+            <div class="cta-buttons">
+                <button class="cta-primary" id="business-signup-btn">Start Today</button>
+                <button class="cta-secondary" id="schedule-demo-btn">Schedule a Demo</button>
+            </div>
         </div>
     </div>
-</div>
-
 </section>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Animate numbers on scroll
+        // Reveal animations when elements come into view
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    animateNumbers();
+                    if (entry.target.classList.contains('testimonial-card')) {
+                        const index = Array.from(entry.target.parentNode.children).indexOf(entry.target);
+                        entry.target.style.setProperty('--card-index', index + 1);
+                        entry.target.style.animation = `fadeInUp 0.8s forwards ${0.2 * (index + 1)}s`;
+                    }
+                    entry.target.classList.add('visible');
                     observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        // Observe elements for scroll animations
+        document.querySelectorAll('.workflow-step, .benefit-item, .testimonial-card').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Button hover and click effects
+        function addButtonEffects(button) {
+            if (!button) return;
+            
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 15px 30px rgba(13, 110, 253, 0.3)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+                this.style.boxShadow = '';
+            });
+            
+            button.addEventListener('click', function() {
+                // Add pulse effect
+                this.classList.remove('pulse');
+                void this.offsetWidth; // Trigger reflow
+                this.classList.add('pulse');
+                
+                // Handle click actions
+                const buttonId = this.id;
+                setTimeout(() => {
+                    if (buttonId === 'business-demo-btn' || buttonId === 'schedule-demo-btn') {
+                        if (typeof openModal === 'function' && document.getElementById('businessSignupModal')) {
+                            openModal(document.getElementById('businessSignupModal'));
+                        }
+                    } else if (buttonId === 'business-signup-btn') {
+                        if (typeof openModal === 'function') {
+                            if (document.getElementById('userTypeModal')) {
+                                openModal(document.getElementById('userTypeModal'));
+                                const businessOption = document.querySelector('.user-type-option[data-type="business"]');
+                                if (businessOption) {
+                                    businessOption.click();
+                                }
+                            } else if (document.getElementById('businessSignupModal')) {
+                                openModal(document.getElementById('businessSignupModal'));
+                            }
+                        }
+                    }
+                }, 400);
+            });
+        }
+        
+        // Apply effects to all CTA buttons
+        addButtonEffects(document.getElementById('business-demo-btn'));
+        addButtonEffects(document.getElementById('business-signup-btn'));
+        addButtonEffects(document.getElementById('schedule-demo-btn'));
+        
+        // Animate workflow icons on hover
+        document.querySelectorAll('.workflow-step').forEach(step => {
+            step.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('.step-icon');
+                if (icon) {
+                    icon.style.transform = 'scale(1.1) rotate(5deg)';
+                }
+            });
+            
+            step.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('.step-icon');
+                if (icon) {
+                    icon.style.transform = '';
                 }
             });
         });
         
-        const pricingSection = document.querySelector('.pricing-section');
-        if (pricingSection) {
-            observer.observe(pricingSection);
-        }
-        
-        function animateNumbers() {
-            const prices = document.querySelectorAll('.tier-price');
+        // Parallax effect for hero shapes
+        window.addEventListener('mousemove', (e) => {
+            const shapes = document.querySelectorAll('.hero-shape');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
             
-            prices.forEach(price => {
-                if (price.textContent === 'Custom') return;
+            shapes.forEach((shape, index) => {
+                const speed = 1 - (index * 0.2);
+                const moveX = (x - 0.5) * 20 * speed;
+                const moveY = (y - 0.5) * 20 * speed;
                 
-                const targetPrice = parseInt(price.textContent.replace(/[^0-9]/g, ''));
-                let currentPrice = 0;
-                const duration = 1500; // ms
-                const increment = targetPrice / (duration / 16);
-                
-                price.textContent = '$0';
-                
-                const updatePrice = () => {
-                    currentPrice += increment;
-                    if (currentPrice < targetPrice) {
-                        price.textContent = '$' + Math.round(currentPrice);
-                        requestAnimationFrame(updatePrice);
-                    } else {
-                        price.textContent = '$' + targetPrice;
-                    }
-                };
-                
-                requestAnimationFrame(updatePrice);
-            });
-        }
-        
-        // Button click events
-        const businessDemoBtn = document.getElementById('business-demo-btn');
-        const businessSignupBtn = document.getElementById('business-signup-btn');
-        const scheduleDemo = document.getElementById('schedule-demo-btn');
-        
-        function addPulseEffect(button) {
-            button.classList.add('pulse');
-            setTimeout(() => {
-                button.classList.remove('pulse');
-            }, 400);
-        }
-        
-        if (businessDemoBtn) {
-            businessDemoBtn.addEventListener('click', function() {
-                addPulseEffect(this);
-                
-                // Open demo request form or modal
-                // This would be connected to your actual demo request functionality
-                if (typeof openModal === 'function' && document.getElementById('businessSignupModal')) {
-                    setTimeout(() => {
-                        openModal(document.getElementById('businessSignupModal'));
-                    }, 400);
-                }
-            });
-        }
-        
-        if (businessSignupBtn) {
-            businessSignupBtn.addEventListener('click', function() {
-                addPulseEffect(this);
-                
-                // Direct to business signup
-                if (typeof openModal === 'function') {
-                    setTimeout(() => {
-                        if (document.getElementById('userTypeModal')) {
-                            openModal(document.getElementById('userTypeModal'));
-                            
-                            // Pre-select business option if possible
-                            const businessOption = document.querySelector('.user-type-option[data-type="business"]');
-                            if (businessOption) {
-                                businessOption.click();
-                            }
-                        } else if (document.getElementById('businessSignupModal')) {
-                            openModal(document.getElementById('businessSignupModal'));
-                        }
-                    }, 400);
-                }
-            });
-        }
-        
-        if (scheduleDemo) {
-            scheduleDemo.addEventListener('click', function() {
-                addPulseEffect(this);
-                
-                // Open demo scheduling calendar or form
-                // This would be connected to your actual scheduling functionality
-                if (typeof openModal === 'function' && document.getElementById('businessSignupModal')) {
-                    setTimeout(() => {
-                        openModal(document.getElementById('businessSignupModal'));
-                    }, 400);
-                }
-            });
-        }
-        
-        // Pricing tier hover effects
-        const pricingTiers = document.querySelectorAll('.pricing-tier');
-        
-        pricingTiers.forEach(tier => {
-            tier.addEventListener('mouseenter', function() {
-                pricingTiers.forEach(t => t.style.transform = 'scale(0.98)');
-                this.style.transform = 'translateY(-15px) scale(1.03)';
-                this.style.zIndex = '10';
-            });
-            
-            tier.addEventListener('mouseleave', function() {
-                pricingTiers.forEach(t => {
-                    t.style.transform = '';
-                    t.style.zIndex = '';
-                });
+                shape.style.transform = `translate(${moveX}px, ${moveY}px)`;
             });
         });
     });

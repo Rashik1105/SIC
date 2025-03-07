@@ -3,7 +3,7 @@
 {% block title %}Social Influencers Connect{% endblock %}
 
 {% block headcontent %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
     .section-fade {
         opacity: 0;
@@ -14,6 +14,7 @@
         opacity: 1;
         transform: translateY(0);
     }
+    
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -30,7 +31,7 @@
           observer.observe(section);
       });
   });
-</script>
+</script> {% endcomment %}
 
 {% comment %} <style>
     :root {
@@ -827,7 +828,7 @@
     {% endif %}
 </div>
 
-<div class="hero section-fade">
+<div class="hero">
     <h1>Connect. Grow. Earn</h1>
     
     <div class="carousel-container">
@@ -918,7 +919,7 @@
 </div>
 
 
-<div class="features section-fade">
+<div class="features">
     <div class="feature-box earnings-box" id="earnings-box"> 
         <h4>Total Earnings</h4> 
         <h3>$450.00</h3> 
@@ -1084,7 +1085,6 @@
         </div> {% endcomment %}
 
     </div>
-
     <section id="influencers" class="section section-fade">
         {% include "sic/for_influencers.html" %}
     </section>
@@ -1095,6 +1095,7 @@
     <section id="about" class="section section-fade">
         {% include "sic/about.html" %}
     </section>
+
 
     {% comment %} {% include "sic/growth_hub.html" %} {% endcomment %}
     {% comment %} {% include "sic/about.html" %} {% endcomment %}
@@ -1459,9 +1460,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const aboutSection = document.getElementById('about')
             
             // Define when sections are considered active
-            const isInfluencersVisible = window.scrollY >= influencersSection.offsetTop - 100;
-            const isBusinessVisible = window.scrollY >= businessSection.offsetTop - 100;
-            const isAboutVisible = window.scrollY >= aboutSection.offsetTop - 100;
+            const isInfluencersVisible = window.scrollY >= influencersSection.offsetTop - 550;
+            const isBusinessVisible = window.scrollY >= businessSection.offsetTop - 550;
+            const isAboutVisible = window.scrollY >= aboutSection.offsetTop - 550;
 
             influencersSection.classList.toggle('section-active', isInfluencersVisible);
             businessSection.classList.toggle('section-active', isBusinessVisible);
