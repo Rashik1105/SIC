@@ -1,9 +1,38 @@
 {% extends 'sic/base.html' %}
-
+{% load static %}
 {% block title %}Social Influencers Connect{% endblock %}
 
 {% block headcontent %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
+    .section-fade {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+    .section-active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      let observer = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                  entry.target.classList.add("section-active");
+                  observer.unobserve(entry.target);
+              }
+          });
+      }, { threshold: 0.3 });
+      
+      document.querySelectorAll(".section-fade").forEach(section => {
+          observer.observe(section);
+      });
+  });
+</script>
+
+{% comment %} <style>
     :root {
         --primary-bg: #f2f5f8;
         --box-bg: #ffffff;
@@ -265,22 +294,6 @@
         border-radius : 100%;
         object-fit: contain;
     }
-
-    {% comment %} .X-icon {
-        background-color: #000000;
-    }
-
-    .instagram-icon {
-        background-color: #ff9900;
-    }
-
-    .facebook-icon {
-        background-color: #1ed760;
-    }
-
-    .youtube-icon {
-        background-color: #D21C1C;
-    } {% endcomment %}
 
     .app-store {
         background-color: #f2f2f2;
@@ -784,7 +797,7 @@
         transform: translateY(0);
     }
     
-</style>
+</style> {% endcomment %}
 {% endblock headcontent %}
 
 {% block content %}
@@ -795,10 +808,10 @@
     </div>
     {% block navcontent %}
     <div class="nav-links">
-        <a href="#">For Influencers</a>
-        <a href="#">For business</a>
-        <a href="#">Growth Hub</a>
-        <a href="#">About</a>
+        <a href="#">For Creators</a>
+        <a href="#">For Businesses</a>
+        {% comment %} <a href="#">Growth Hub</a> {% endcomment %}
+        <a href="#">About</a>   
         {% comment %} <a href="#">Media</a>
         <a href="#">Blog</a> {% endcomment %}
     </div>
@@ -814,20 +827,98 @@
     {% endif %}
 </div>
 
-<div class="hero">
+<div class="hero section-fade">
     <h1>Connect. Grow. Earn</h1>
-    <p>At <strong>SIC</strong>, we bridge the gap between influencers and businesses, helping you connect with the right opportunities, gain valuable insights, and grow your earnings.</p> 
-    <div class="progress-dots"> 
-        <div class="dot active"></div> 
+    
+    <div class="carousel-container">
+        <div class="carousel-slides">
+            <div class="carousel-slide active">
+                <p>At <strong>SIC</strong>, we bridge the gap between influencers and businesses, helping you connect with the right opportunities, gain valuable insights, and grow your earnings.</p>
+                {% comment %} <div class="key-features">
+                    <div class="feature-item">
+                        <h3>For Influencers 🎯</h3>
+                        <p>Find brands that align with your values and audience</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>For Businesses 💼</h3>
+                        <p>Connect with creators who truly understand your brand</p>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+            
+            <div class="carousel-slide">
+                <p>Track your growth and success with our advanced analytics platform. Make data-driven decisions to optimize your partnerships.</p>
+                {% comment %} <div class="key-features">
+                    <div class="feature-item">
+                        <h3>Analytics Dashboard 📊</h3>
+                        <p>Real-time metrics and performance tracking</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>ROI Tracking 💰</h3>
+                        <p>Measure the impact of your collaborations</p>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+            
+            <div class="carousel-slide">
+                <p>Your security is our priority. All partnerships and transactions are protected by our secure platform.</p>
+                {% comment %} <div class="key-features">
+                    <div class="feature-item">
+                        <h3>Secure Payments 🔒</h3>
+                        <p>Protected transactions and escrow services</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Verified Profiles ✓</h3>
+                        <p>Trust and transparency in every connection</p>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+            
+            <div class="carousel-slide">
+                <p>Join thousands of successful creators and businesses who have found their perfect match on SIC.</p>
+                {% comment %} <div class="key-features">
+                    <div class="feature-item">
+                        <h3>Success Stories 🌟</h3>
+                        <p>Real results from our community</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>Global Network 🌍</h3>
+                        <p>Connect with partners worldwide</p>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+            
+            <div class="carousel-slide">
+                <p>Ready to start your journey? Join SIC today and transform your social media presence into a thriving business.</p>
+                {% comment %} <div class="key-features">
+                    <div class="feature-item">
+                        <h3>Easy Onboarding 🚀</h3>
+                        <p>Get started in minutes</p>
+                    </div>
+                    <div class="feature-item">
+                        <h3>24/7 Support 💬</h3>
+                        <p>We're here to help you succeed</p>
+                    </div>
+                </div> {% endcomment %}
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-dots">
+        <div class="dot active"></div>
+        <div class="progress-line active"></div>
+        <div class="dot"></div>
         <div class="progress-line"></div>
-         <div class="dot"></div> 
-         <div class="progress-line"></div> 
-         <div class="dot secure"></div> <div class="progress-line">
-         </div> <div class="dot"></div> <div class="progress-line">
-         </div> <div class="dot"></div> </div>
+        <div class="dot secure"></div>
+        <div class="progress-line"></div>
+        <div class="dot"></div>
+        <div class="progress-line"></div>
+        <div class="dot"></div>
+    </div>
 </div>
 
-<div class="features">
+
+<div class="features section-fade">
     <div class="feature-box earnings-box" id="earnings-box"> 
         <h4>Total Earnings</h4> 
         <h3>$450.00</h3> 
@@ -993,6 +1084,20 @@
         </div> {% endcomment %}
 
     </div>
+
+    <section id="influencers" class="section section-fade">
+        {% include "sic/for_influencers.html" %}
+    </section>
+    
+    <section id="business" class="section section-fade">
+        {% include "sic/for_bussiness.html" %}
+    </section>
+    <section id="about" class="section section-fade">
+        {% include "sic/about.html" %}
+    </section>
+
+    {% comment %} {% include "sic/growth_hub.html" %} {% endcomment %}
+    {% comment %} {% include "sic/about.html" %} {% endcomment %}
     
     <script>
         // Animation for feature boxes
@@ -1328,13 +1433,140 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Attach AJAX form handlers
-    const signupForm = document.getElementById("business-signup-form");
-    const loginForm = document.getElementById("business-login-form");
+        const signupForm = document.getElementById("business-signup-form");
+        const loginForm = document.getElementById("business-login-form");
 
-    if (signupForm) submitForm(signupForm, "register");
-    if (loginForm) submitForm(loginForm, "login");
-});
+        if (signupForm) submitForm(signupForm, "register");
+        if (loginForm) submitForm(loginForm, "login");
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth scrolling to all links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add active class to sections as user scrolls
+        window.addEventListener('scroll', function() {
+            const influencersSection = document.getElementById('influencers');
+            const businessSection = document.getElementById('business');
+            const aboutSection = document.getElementById('about')
+            
+            // Define when sections are considered active
+            const isInfluencersVisible = window.scrollY >= influencersSection.offsetTop - 100;
+            const isBusinessVisible = window.scrollY >= businessSection.offsetTop - 100;
+            const isAboutVisible = window.scrollY >= aboutSection.offsetTop - 100;
+
+            influencersSection.classList.toggle('section-active', isInfluencersVisible);
+            businessSection.classList.toggle('section-active', isBusinessVisible);
+            aboutSection.classList.toggle('section-active', isAboutVisible);
+        });
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dots = document.querySelectorAll('.dot');
+        const slides = document.querySelectorAll('.carousel-slide');
+        const lines = document.querySelectorAll('.progress-line');
+        let currentSlide = 0;
+        let autoSlideInterval;
+    
+        function updateSlide(newIndex) {
+            // Remove all state classes
+            slides.forEach(slide => {
+                slide.classList.remove('active', 'previous', 'next');
+            });
+    
+            // Add appropriate classes for transition
+            slides[currentSlide].classList.add('previous');
+            slides[newIndex].classList.add('active');
+    
+            // Update dots and lines
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === newIndex);
+                if (index < newIndex) {
+                    lines[index].classList.add('active');
+                } else if (index > newIndex) {
+                    lines[index-1].classList.remove('active');
+                }
+            });
+    
+            // Calculate next slide index
+            let nextIndex = (newIndex + 1) % slides.length;
+            slides[nextIndex].classList.add('next');
+    
+            currentSlide = newIndex;
+        }
+    
+        function nextSlide() {
+            let nextIndex = (currentSlide + 1) % slides.length;
+            updateSlide(nextIndex);
+        }
+    
+        // Add click events to dots with transition handling
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                // Prevent rapid clicking
+                if (index !== currentSlide) {
+                    clearInterval(autoSlideInterval);
+                    updateSlide(index);
+                    startAutoSlide();
+                }
+            });
+        });
+    
+        function startAutoSlide() {
+            autoSlideInterval = setInterval(nextSlide, 5000);
+        }
+    
+        // Initialize first slide
+        updateSlide(0);
+        startAutoSlide();
+    
+        // Pause on hover
+        const carouselContainer = document.querySelector('.carousel-container');
+        carouselContainer.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+        carouselContainer.addEventListener('mouseleave', startAutoSlide);
+    
+        // Optional: Add touch support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+    
+        carouselContainer.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+    
+        carouselContainer.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+    
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+    
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left
+                    nextSlide();
+                } else {
+                    // Swipe right
+                    let prevIndex = currentSlide - 1;
+                    if (prevIndex < 0) prevIndex = slides.length - 1;
+                    updateSlide(prevIndex);
+                }
+                clearInterval(autoSlideInterval);
+                startAutoSlide();
+            }
+        }
+    });
 
 
     </script>
-    {% endblock %}
+{% endblock %}

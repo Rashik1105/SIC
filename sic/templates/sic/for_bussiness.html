@@ -1,0 +1,822 @@
+{% extends 'sic/base.html' %}
+
+{% comment %} {% block title %}For Business - Social Influencers Connect{% endblock %} {% endcomment %}
+{% load static %}
+
+{% block headcontent %}
+{% comment %} <style>
+    .business-hero {
+        text-align: center;
+        padding: 80px 5% 60px;
+        background: linear-gradient(180deg, var(--primary-bg) 0%, #e8f0fb 100%);
+    }
+
+    .business-hero h1 {
+        font-size: 48px;
+        font-weight: 800;
+        margin-bottom: 20px;
+        background: linear-gradient(90deg, #293648 0%, #0d6efd 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 200% auto;
+        animation: gradientSlide 6s ease infinite;
+    }
+
+    @keyframes gradientSlide {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .business-subtitle {
+        font-size: 20px;
+        max-width: 700px;
+        margin: 0 auto 40px;
+        color: var(--text-light);
+    }
+
+    .client-logos {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 40px;
+        margin: 50px 0;
+    }
+
+    .client-logo {
+        height: 40px;
+        filter: grayscale(100%);
+        opacity: 0.7;
+        transition: all 0.3s ease;
+    }
+
+    .client-logo:hover {
+        filter: grayscale(0%);
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .workflow-section {
+        padding: 100px 5%;
+        background-color: var(--primary-bg);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 80px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 15px;
+    }
+
+    .section-header p {
+        color: var(--text-light);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .workflow-steps {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .workflow-step {
+        flex: 1;
+        min-width: 250px;
+        max-width: 350px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        position: relative;
+    }
+
+    .step-number {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #0d6efd;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
+        position: relative;
+        z-index: 2;
+    }
+
+    .workflow-step:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 30px;
+        right: -15%;
+        width: 30%;
+        height: 3px;
+        background-color: #e0e6ed;
+        z-index: 1;
+    }
+
+    .step-content {
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 35px 25px 25px;
+        box-shadow: var(--box-shadow);
+        margin-top: -30px;
+        position: relative;
+        z-index: 1;
+        height: calc(100% - 30px);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .workflow-step:hover .step-content {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .step-content h3 {
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .step-content p {
+        color: var(--text-light);
+        flex-grow: 1;
+    }
+
+    .step-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+    }
+
+    .benefits-section {
+        padding: 100px 5%;
+        background-color: #f8fafc;
+    }
+
+    .benefits-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 50px;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .benefits-image {
+        flex: 1;
+        min-width: 300px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+    }
+
+    .benefits-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.5s;
+    }
+
+    .benefits-image:hover img {
+        transform: scale(1.05);
+    }
+
+    .benefits-content {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .benefits-content h2 {
+        font-size: 32px;
+        margin-bottom: 25px;
+        color: var(--text-dark);
+    }
+
+    .benefit-item {
+        display: flex;
+        margin-bottom: 30px;
+    }
+
+    .benefit-icon-container {
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        background-color: rgba(13, 110, 253, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+    }
+
+    .benefit-icon-container img {
+        width: 25px;
+        height: 25px;
+    }
+
+    .benefit-text h4 {
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .benefit-text p {
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+
+    .pricing-section {
+        padding: 100px 5%;
+        background-color: var(--primary-bg);
+    }
+
+    .pricing-tiers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .pricing-tier {
+        flex: 1;
+        min-width: 300px;
+        max-width: 380px;
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        box-shadow: var(--box-shadow);
+        transition: transform 0.3s, box-shadow 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .pricing-tier:hover {
+        transform: translateY(-15px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .tier-popular {
+        position: absolute;
+        top: 20px;
+        right: -35px;
+        background-color: #0d6efd;
+        color: white;
+        padding: 8px 40px;
+        font-size: 14px;
+        transform: rotate(45deg);
+        font-weight: 600;
+    }
+
+    .tier-name {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .tier-price {
+        font-size: 48px;
+        font-weight: 800;
+        margin-bottom: 5px;
+        color: #0d6efd;
+    }
+
+    .tier-billing {
+        color: var(--text-light);
+        margin-bottom: 25px;
+    }
+
+    .tier-features {
+        margin-bottom: 30px;
+    }
+
+    .tier-feature {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+
+    .feature-icon {
+        color: #0d6efd;
+        margin-right: 10px;
+        font-size: 20px;
+    }
+
+    .feature-text {
+        color: var(--text-dark);
+        line-height: 1.4;
+    }
+
+    .tier-cta {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .tier-cta:hover {
+        background-color: #0b5ed7;
+        transform: translateY(-3px);
+    }
+
+    .tier-secondary {
+        background-color: transparent;
+        border: 2px solid #0d6efd;
+        color: #0d6efd;
+    }
+
+    .tier-secondary:hover {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+
+    .testimonials-section {
+        padding: 100px 5%;
+        background-color: #f8fafc;
+    }
+
+    .testimonial-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .testimonial-card {
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        box-shadow: var(--box-shadow);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .testimonial-content {
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 20px;
+    }
+
+    .testimonial-content::before {
+        content: """;
+        position: absolute;
+        left: -10px;
+        top: -20px;
+        font-size: 60px;
+        color: rgba(13, 110, 253, 0.2);
+        font-family: Georgia, serif;
+    }
+
+    .testimonial-content p {
+        font-style: italic;
+        color: var(--text-dark);
+        line-height: 1.6;
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+    }
+
+    .author-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-right: 15px;
+        object-fit: cover;
+    }
+
+    .author-info h4 {
+        margin: 0;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .author-info p {
+        margin: 5px 0 0;
+        color: var(--text-light);
+        font-size: 14px;
+    }
+
+    .cta-section {
+        text-align: center;
+        padding: 100px 5%;
+        background: linear-gradient(135deg, #f2f5f8 0%, #e4ecf7 100%);
+    }
+
+    .cta-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .cta-content h2 {
+        font-size: 36px;
+        margin-bottom: 20px;
+        color: var(--text-dark);
+    }
+
+    .cta-content p {
+        margin-bottom: 40px;
+        color: var(--text-light);
+        font-size: 18px;
+    }
+
+    .cta-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .cta-primary {
+        background: linear-gradient(90deg, #0d6efd 0%, #83b8ff 100%);
+        color: white;
+        font-weight: 600;
+        padding: 15px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .cta-primary:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(13, 110, 253, 0.3);
+    }
+
+    .cta-secondary {
+        background-color: white;
+        color: var(--text-dark);
+        font-weight: 600;
+        padding: 15px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .cta-secondary:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .business-hero h1 {
+            font-size: 36px;
+        }
+        
+        .workflow-step:not(:last-child)::after {
+            display: none;
+        }
+        
+        .benefits-container {
+            flex-direction: column;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style> {% endcomment %}
+{% endblock %}
+
+{% block content %}
+<section class="business-section">
+<div class="business-hero">
+    <h1>Transform Your Marketing Strategy</h1>
+    <p class="business-subtitle">Connect with the perfect influencers for your brand, get actionable insights, and achieve measurable results with our data-driven platform.</p>
+    
+    <button class="cta-primary" id="business-demo-btn">Request a Demo</button>
+    
+    <div class="client-logos">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" class="client-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg" alt="Samsung" class="client-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" class="client-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" class="client-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" class="client-logo">
+    </div>
+</div>
+
+<div class="workflow-section">
+    <div class="section-header">
+        <h2>Our Simple 4-Step Process</h2>
+        <p>From discovery to results, we've streamlined influencer marketing to save you time and maximize ROI.</p>
+    </div>
+    
+    <div class="workflow-steps">
+        <div class="workflow-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <img src="https://cdn-icons-png.flaticon.com/512/2436/2436874.png" alt="Define" class="step-icon">
+                <h3>Define Your Campaign</h3>
+                <p>Set your goals, budget, and target audience. Our platform helps you craft campaign briefs that attract the right talent.</p>
+            </div>
+        </div>
+        
+        <div class="workflow-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <img src="https://cdn-icons-png.flaticon.com/512/2791/2791226.png" alt="Discover" class="step-icon">
+                <h3>Discover Influencers</h3>
+                <p>Our AI matching algorithm suggests creators based on audience demographics, engagement quality, and brand alignment.</p>
+            </div>
+        </div>
+        
+        <div class="workflow-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <img src="https://cdn-icons-png.flaticon.com/512/4727/4727443.png" alt="Collaborate" class="step-icon">
+                <h3>Collaborate Seamlessly</h3>
+                <p>Manage contracts, briefs, content approval, and payments all in one platform with our streamlined workflow.</p>
+            </div>
+        </div>
+        
+        <div class="workflow-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <img src="https://cdn-icons-png.flaticon.com/512/6021/6021475.png" alt="Measure" class="step-icon">
+                <h3>Measure & Optimize</h3>
+                <p>Track performance metrics in real-time and get actionable insights to continuously improve your campaigns.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="benefits-section">
+    <div class="benefits-container">
+        <div class="benefits-image">
+            <img src="https://images.unsplash.com/photo-1537511446984-935f663eb1f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Business dashboard">
+        </div>
+        
+        <div class="benefits-content">
+            <h2>Why Businesses Choose SIC</h2>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon-container">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4947/4947398.png" alt="Targeted">
+                </div>
+                <div class="benefit-text">
+                    <h4>Hyper-Targeted Audience Reach</h4>
+                    <p>Access influencers whose audiences perfectly match your target demographics, interests, and purchasing behaviors.</p>
+                </div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon-container">
+                    <img src="https://cdn-icons-png.flaticon.com/512/9329/9329983.png" alt="Data">
+                </div>
+                <div class="benefit-text">
+                    <h4>Data-Driven Decision Making</h4>
+                    <p>Leverage comprehensive analytics to select influencers based on authentic engagement, not just follower counts.</p>
+                </div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon-container">
+                    <img src="https://cdn-icons-png.flaticon.com/512/5956/5956592.png" alt="Automation">
+                </div>
+                <div class="benefit-text">
+                    <h4>Workflow Automation</h4>
+                    <p>Save 70% of administrative time with our end-to-end campaign management tools and templates.</p>
+                </div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon-container">
+                    <img src="https://cdn-icons-png.flaticon.com/512/6213/6213450.png" alt="ROI">
+                </div>
+                <div class="benefit-text">
+                    <h4>Proven ROI</h4>
+                    <p>Our clients see an average of 11x return on investment through our optimized influencer selection and campaign strategies.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="testimonials-section">
+    <div class="section-header">
+        <h2>What Our Clients Say</h2>
+        <p>Join hundreds of businesses that have transformed their influencer marketing with SIC.</p>
+    </div>
+    
+    <div class="testimonial-grid">
+        <div class="testimonial-card">
+            <div class="testimonial-content">
+                <p>"SIC revolutionized how we approach influencer marketing. We've seen a 3x increase in engagement and a significant boost in conversions since we started using the platform."</p>
+            </div>
+            <div class="testimonial-author">
+                <img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Sarah Johnson" class="author-avatar">
+                <div class="author-info">
+                    <h4>Sarah Johnson</h4>
+                    <p>Marketing Director, TechGlobal</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="testimonial-card">
+            <div class="testimonial-content">
+                <p>"The data insights we get from SIC help us make informed decisions about which influencers to work with. No more guesswork—just measurable results."</p>
+            </div>
+            <div class="testimonial-author">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Michael Chen" class="author-avatar">
+                <div class="author-info">
+                    <h4>Michael Chen</h4>
+                    <p>CMO, FitLifestyle</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="testimonial-card">
+            <div class="testimonial-content">
+                <p>"As a small business, we were hesitant about influencer marketing. SIC made it accessible and effective. The ROI speaks for itself—best marketing decision we've made."</p>
+            </div>
+            <div class="testimonial-author">
+                <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Jessica Torres" class="author-avatar">
+                <div class="author-info">
+                    <h4>Jessica Torres</h4>
+                    <p>Founder, Artisan Goods Co.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to Transform Your Influencer Marketing?</h2>
+        <p>Join leading brands leveraging data-driven influencer campaigns to drive growth and authentic connections.</p>
+        
+        <div class="cta-buttons">
+            <button class="cta-primary" id="business-signup-btn">Start Today</button>
+            <button class="cta-secondary" id="schedule-demo-btn">Schedule a Demo</button>
+        </div>
+    </div>
+</div>
+
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate numbers on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateNumbers();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+        
+        const pricingSection = document.querySelector('.pricing-section');
+        if (pricingSection) {
+            observer.observe(pricingSection);
+        }
+        
+        function animateNumbers() {
+            const prices = document.querySelectorAll('.tier-price');
+            
+            prices.forEach(price => {
+                if (price.textContent === 'Custom') return;
+                
+                const targetPrice = parseInt(price.textContent.replace(/[^0-9]/g, ''));
+                let currentPrice = 0;
+                const duration = 1500; // ms
+                const increment = targetPrice / (duration / 16);
+                
+                price.textContent = '$0';
+                
+                const updatePrice = () => {
+                    currentPrice += increment;
+                    if (currentPrice < targetPrice) {
+                        price.textContent = '$' + Math.round(currentPrice);
+                        requestAnimationFrame(updatePrice);
+                    } else {
+                        price.textContent = '$' + targetPrice;
+                    }
+                };
+                
+                requestAnimationFrame(updatePrice);
+            });
+        }
+        
+        // Button click events
+        const businessDemoBtn = document.getElementById('business-demo-btn');
+        const businessSignupBtn = document.getElementById('business-signup-btn');
+        const scheduleDemo = document.getElementById('schedule-demo-btn');
+        
+        function addPulseEffect(button) {
+            button.classList.add('pulse');
+            setTimeout(() => {
+                button.classList.remove('pulse');
+            }, 400);
+        }
+        
+        if (businessDemoBtn) {
+            businessDemoBtn.addEventListener('click', function() {
+                addPulseEffect(this);
+                
+                // Open demo request form or modal
+                // This would be connected to your actual demo request functionality
+                if (typeof openModal === 'function' && document.getElementById('businessSignupModal')) {
+                    setTimeout(() => {
+                        openModal(document.getElementById('businessSignupModal'));
+                    }, 400);
+                }
+            });
+        }
+        
+        if (businessSignupBtn) {
+            businessSignupBtn.addEventListener('click', function() {
+                addPulseEffect(this);
+                
+                // Direct to business signup
+                if (typeof openModal === 'function') {
+                    setTimeout(() => {
+                        if (document.getElementById('userTypeModal')) {
+                            openModal(document.getElementById('userTypeModal'));
+                            
+                            // Pre-select business option if possible
+                            const businessOption = document.querySelector('.user-type-option[data-type="business"]');
+                            if (businessOption) {
+                                businessOption.click();
+                            }
+                        } else if (document.getElementById('businessSignupModal')) {
+                            openModal(document.getElementById('businessSignupModal'));
+                        }
+                    }, 400);
+                }
+            });
+        }
+        
+        if (scheduleDemo) {
+            scheduleDemo.addEventListener('click', function() {
+                addPulseEffect(this);
+                
+                // Open demo scheduling calendar or form
+                // This would be connected to your actual scheduling functionality
+                if (typeof openModal === 'function' && document.getElementById('businessSignupModal')) {
+                    setTimeout(() => {
+                        openModal(document.getElementById('businessSignupModal'));
+                    }, 400);
+                }
+            });
+        }
+        
+        // Pricing tier hover effects
+        const pricingTiers = document.querySelectorAll('.pricing-tier');
+        
+        pricingTiers.forEach(tier => {
+            tier.addEventListener('mouseenter', function() {
+                pricingTiers.forEach(t => t.style.transform = 'scale(0.98)');
+                this.style.transform = 'translateY(-15px) scale(1.03)';
+                this.style.zIndex = '10';
+            });
+            
+            tier.addEventListener('mouseleave', function() {
+                pricingTiers.forEach(t => {
+                    t.style.transform = '';
+                    t.style.zIndex = '';
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

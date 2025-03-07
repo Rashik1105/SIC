@@ -1,0 +1,747 @@
+{% extends "sic/base.html" %}
+
+{% block headcontent %}
+
+<style>
+    /* About Page Styles */
+    .about-container {
+        padding: 40px 5%;
+        max-width: 1200px;
+        margin: 0 auto;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .about-hero {
+        display: flex;
+        align-items: center;
+        gap: 50px;
+        margin-bottom: 60px;
+    }
+    
+    .about-hero-content {
+        flex: 1;
+    }
+    
+    .about-hero-content h1 {
+        font-size: 48px;
+        margin-bottom: 20px;
+        color: var(--text-dark);
+        letter-spacing: -0.5px;
+    }
+    
+    .about-subtitle {
+        font-size: 20px;
+        color: var(--text-light);
+        line-height: 1.5;
+    }
+    
+    .about-hero-image {
+        flex: 1;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .about-hero-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        transition: transform 0.8s;
+    }
+    
+    .about-hero-image:hover img {
+        transform: scale(1.05);
+    }
+    
+    .mission-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 60px;
+    }
+    
+    .mission-card {
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        box-shadow: var(--box-shadow);
+        transition: transform 0.3s;
+    }
+    
+    .mission-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .mission-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background-color: rgba(13, 110, 253, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        color: var(--accent-color);
+    }
+    
+    .mission-card h3 {
+        font-size: 22px;
+        margin-bottom: 15px;
+        color: var(--text-dark);
+    }
+    
+    .mission-card p {
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+    
+    .story-section {
+        margin-bottom: 60px;
+    }
+    
+    .story-section h2 {
+        font-size: 36px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+    
+    .timeline {
+        position: relative;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background-color: #e4e7eb;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .timeline-item {
+        padding: 30px 0;
+        position: relative;
+    }
+    
+    .timeline-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: var(--accent-color);
+        position: absolute;
+        left: 50%;
+        top: 30px;
+        transform: translateX(-50%);
+        z-index: 1;
+    }
+    
+    .timeline-content {
+        width: 45%;
+        position: relative;
+        padding: 25px;
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+    
+    .timeline-item:nth-child(odd) .timeline-content {
+        left: 0;
+    }
+    
+    .timeline-item:nth-child(even) .timeline-content {
+        left: 55%;
+    }
+    
+    .timeline-content h3 {
+        font-size: 24px;
+        color: var(--accent-color);
+        margin-bottom: 5px;
+    }
+    
+    .timeline-content h4 {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+    
+    .timeline-content p {
+        line-height: 1.6;
+        color: var(--text-light);
+    }
+    
+    .team-section {
+        margin-bottom: 60px;
+        text-align: center;
+    }
+    
+    .team-section h2 {
+        font-size: 36px;
+        margin-bottom: 15px;
+    }
+    
+    .team-subtitle {
+        font-size: 18px;
+        color: var(--text-light);
+        max-width: 700px;
+        margin: 0 auto 40px;
+        line-height: 1.5;
+    }
+    
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 30px;
+    }
+    
+    .team-member {
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        box-shadow: var(--box-shadow);
+        transition: transform 0.3s;
+    }
+    
+    .team-member:hover {
+        transform: translateY(-10px);
+    }
+    
+    .member-photo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        overflow: hidden;
+    }
+    
+    .member-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .team-member h3 {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+    
+    .member-title {
+        color: var(--accent-color);
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .member-bio {
+        color: var(--text-light);
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+    
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .social-link {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: #f2f5f8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-dark);
+        transition: all 0.3s;
+    }
+    
+    .social-link:hover {
+        background-color: var(--accent-color);
+        color: white;
+    }
+    
+    .stats-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 60px;
+    }
+    
+    .stat-card {
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        text-align: center;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .stat-card h3 {
+        font-size: 36px;
+        color: var(--accent-color);
+        margin-bottom: 10px;
+    }
+    
+    .testimonials-section {
+        margin-bottom: 60px;
+        text-align: center;
+    }
+    
+    .testimonials-section h2 {
+        font-size: 36px;
+        margin-bottom: 40px;
+    }
+    
+    .testimonial-slider {
+        display: flex;
+        gap: 30px;
+    }
+    
+    .testimonial {
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        box-shadow: var(--box-shadow);
+        flex: 1;
+    }
+    
+    .testimonial-content {
+        margin-bottom: 20px;
+    }
+    
+    .testimonial-content p {
+        font-style: italic;
+        color: var(--text-dark);
+        line-height: 1.6;
+        position: relative;
+        padding: 0 10px;
+    }
+    
+    .testimonial-content p::before {
+        content: '"';
+        font-size: 60px;
+        color: rgba(13, 110, 253, 0.1);
+        position: absolute;
+        left: -20px;
+        top: -20px;
+    }
+    
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .testimonial-author img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .testimonial-author h4 {
+        font-size: 16px;
+        margin-bottom: 5px;
+        text-align: left;
+    }
+    
+    .testimonial-author p {
+        font-size: 14px;
+        color: var(--text-light);
+        text-align: left;
+    }
+    
+    .contact-section {
+        text-align: center;
+    }
+    
+    .contact-section h2 {
+        font-size: 36px;
+        margin-bottom: 40px;
+    }
+    
+    .contact-methods {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+    }
+    
+    .contact-card {
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        box-shadow: var(--box-shadow);
+        transition: transform 0.3s;
+    }
+    
+    .contact-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .contact-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: rgba(13, 110, 253, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: var(--accent-color);
+    }
+    
+    .contact-card h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .contact-card p {
+        color: var(--text-light);
+    }
+    
+    /* Animation Keyframes */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Add animation classes */
+    .animate {
+        animation: fadeIn 0.8s forwards;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 900px) {
+        .about-hero {
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .timeline::before {
+            left: 30px;
+        }
+        
+        .timeline-dot {
+            left: 30px;
+        }
+        
+        .timeline-content {
+            width: calc(100% - 80px);
+            left: 80px !important;
+        }
+        
+        .testimonial-slider {
+            flex-direction: column;
+        }
+    }
+    
+    @media (max-width: 600px) {
+        .about-hero h1, .story-section h2, .team-section h2, .testimonials-section h2, .contact-section h2 {
+            font-size: 32px;
+        }
+    }
+
+</style>
+
+{% endblock headcontent %}
+
+{% block content %}
+<!-- About Page Content -->
+<div class="about-container">
+    <div class="about-hero">
+        <div class="about-hero-content">
+            <h1>Our <span class="accent-text">Story</span></h1>
+            <p class="about-subtitle">Building bridges between influencers and businesses since 2020</p>
+        </div>
+        <div class="about-hero-image">
+            <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" alt="SIC Team Collaboration">
+        </div>
+    </div>
+
+    <div class="mission-section">
+        <div class="mission-card">
+            <div class="mission-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L4 5V11.09C4 16.14 7.41 20.85 12 22C16.59 20.85 20 16.14 20 11.09V5L12 2ZM16 13H13V16H11V13H8V11H11V8H13V11H16V13Z" fill="currentColor"/>
+                </svg>
+            </div>
+            <h3>Our Mission</h3>
+            <p>To create a transparent ecosystem where influencers and businesses can collaborate ethically and profitably, driving mutual growth and innovation in the creator economy.</p>
+        </div>
+        
+        <div class="mission-card">
+            <div class="mission-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z" fill="currentColor"/>
+                </svg>
+            </div>
+            <h3>Our Vision</h3>
+            <p>A world where every creator has the tools, insights, and opportunities to build sustainable careers while helping businesses connect authentically with their ideal audiences.</p>
+        </div>
+        
+        <div class="mission-card">
+            <div class="mission-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" fill="currentColor"/>
+                </svg>
+            </div>
+            <h3>Our Values</h3>
+            <p>Transparency, innovation, creator empowerment, data privacy, and authentic connections form the foundation of everything we do at SIC.</p>
+        </div>
+    </div>
+
+    <div class="story-section">
+        <h2>The SIC <span class="accent-text">Journey</span></h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>2020</h3>
+                    <h4>The Beginning</h4>
+                    <p>Founded by a team of marketers and tech entrepreneurs who saw the gap between content creators and businesses looking to partner with them.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>2021</h3>
+                    <h4>Platform Launch</h4>
+                    <p>SIC platform officially launched with core features for matching influencers with relevant businesses and tracking campaign performance.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>2022</h3>
+                    <h4>Growth & Expansion</h4>
+                    <p>Expanded our team and added advanced analytics features to help creators understand their audience and optimize content strategy.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>2023</h3>
+                    <h4>Creator Economy Focus</h4>
+                    <p>Introduced monetization tools and expanded resources to help creators build sustainable businesses beyond one-off brand deals.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>2024</h3>
+                    <h4>Global Community</h4>
+                    <p>Reached 100,000+ creators and 5,000+ businesses on our platform, with users from over 30 countries worldwide.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h3>2025</h3>
+                    <h4>The Future</h4>
+                    <p>Continuing our mission to innovate and empower creators with cutting-edge tools and meaningful business connections.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="team-section">
+        <h2>Meet the <span class="accent-text">Team</span></h2>
+        <p class="team-subtitle">We're a diverse group of marketers, technologists, and former creators united by our passion for the creator economy.</p>
+        
+        <div class="team-grid">
+            <div class="team-member">
+                <div class="member-photo">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Sarah Johnson">
+                </div>
+                <h3>Sarah Johnson</h3>
+                <p class="member-title">Co-Founder & CEO</p>
+                <p class="member-bio">Former tech executive passionate about building tools for creators to thrive in the digital economy.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM8 19H5V8H8V19ZM6.5 6.71C5.67 6.71 5 6.04 5 5.21C5 4.38 5.67 3.71 6.5 3.71C7.33 3.71 8 4.38 8 5.21C8 6.04 7.33 6.71 6.5 6.71ZM19 19H16V13.4C16 12.63 15.79 11.8 14.97 11.8C13.87 11.8 13.5 12.66 13.5 13.54V19H10.5V8H13.5V9.2C13.87 8.52 14.68 8 15.81 8C17.7 8 19 9.28 19 12.21V19Z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.46 6C21.69 6.35 20.86 6.58 20 6.69C20.88 6.16 21.56 5.32 21.88 4.31C21.05 4.81 20.13 5.16 19.16 5.36C18.37 4.5 17.26 4 16 4C13.65 4 11.73 5.92 11.73 8.29C11.73 8.63 11.77 8.96 11.84 9.27C8.28 9.09 5.11 7.38 3 4.79C2.63 5.42 2.42 6.16 2.42 6.94C2.42 8.43 3.17 9.75 4.33 10.5C3.62 10.5 2.96 10.3 2.38 10V10.03C2.38 12.11 3.86 13.85 5.82 14.24C5.46 14.34 5.08 14.39 4.69 14.39C4.42 14.39 4.15 14.36 3.89 14.31C4.43 16 6 17.26 7.89 17.29C6.43 18.45 4.58 19.13 2.56 19.13C2.22 19.13 1.88 19.11 1.54 19.07C3.44 20.29 5.7 21 8.12 21C16 21 20.33 14.46 20.33 8.79C20.33 8.6 20.33 8.42 20.32 8.23C21.16 7.63 21.88 6.87 22.46 6Z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-photo">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Michael Chen">
+                </div>
+                <h3>Michael Chen</h3>
+                <p class="member-title">Co-Founder & CTO</p>
+                <p class="member-bio">Tech innovator with a background in AI and data science, focused on building intuitive tools for creators.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM8 19H5V8H8V19ZM6.5 6.71C5.67 6.71 5 6.04 5 5.21C5 4.38 5.67 3.71 6.5 3.71C7.33 3.71 8 4.38 8 5.21C8 6.04 7.33 6.71 6.5 6.71ZM19 19H16V13.4C16 12.63 15.79 11.8 14.97 11.8C13.87 11.8 13.5 12.66 13.5 13.54V19H10.5V8H13.5V9.2C13.87 8.52 14.68 8 15.81 8C17.7 8 19 9.28 19 12.21V19Z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22.46 6C21.69 6.35 20.86 6.58 20 6.69C20.88 6.16 21.56 5.32 21.88 4.31C21.05 4.81 20.13 5.16 19.16 5.36C18.37 4.5 17.26 4 16 4C13.65 4 11.73 5.92 11.73 8.29C11.73 8.63 11.77 8.96 11.84 9.27C8.28 9.09 5.11 7.38 3 4.79C2.63 5.42 2.42 6.16 2.42 6.94C2.42 8.43 3.17 9.75 4.33 10.5C3.62 10.5 2.96 10.3 2.38 10V10.03C2.38 12.11 3.86 13.85 5.82 14.24C5.46 14.34 5.08 14.39 4.69 14.39C4.42 14.39 4.15 14.36 3.89 14.31C4.43 16 6 17.26 7.89 17.29C6.43 18.45 4.58 19.13 2.56 19.13C2.22 19.13 1.88 19.11 1.54 19.07C3.44 20.29 5.7 21 8.12 21C16 21 20.33 14.46 20.33 8.79C20.33 8.6 20.33 8.42 20.32 8.23C21.16 7.63 21.88 6.87 22.46 6Z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-photo">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Priya Sharma">
+                </div>
+                <h3>Priya Sharma</h3>
+                <p class="member-title">Chief Marketing Officer</p>
+                <p class="member-bio">Former content creator with 500K+ followers, now helping other creators build strategic marketing plans.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM8 19H5V8H8V19ZM6.5 6.71C5.67 6.71 5 6.04 5 5.21C5 4.38 5.67 3.71 6.5 3.71C7.33 3.71 8 4.38 8 5.21C8 6.04 7.33 6.71 6.5 6.71ZM19 19H16V13.4C16 12.63 15.79 11.8 14.97 11.8C13.87 11.8 13.5 12.66 13.5 13.54V19H10.5V8H13.5V9.2C13.87 8.52 14.68 8 15.81 8C17.7 8 19 9.28 19 12.21V19Z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22.46 6C21.69 6.35 20.86 6.58 20 6.69C20.88 6.16 21.56 5.32 21.88 4.31C21.05 4.81 20.13 5.16 19.16 5.36C18.37 4.5 17.26 4 16 4C13.65 4 11.73 5.92 11.73 8.29C11.73 8.63 11.77 8.96 11.84 9.27C8.28 9.09 5.11 7.38 3 4.79C2.63 5.42 2.42 6.16 2.42 6.94C2.42 8.43 3.17 9.75 4.33 10.5C3.62 10.5 2.96 10.3 2.38 10V10.03C2.38 12.11 3.86 13.85 5.82 14.24C5.46 14.34 5.08 14.39 4.69 14.39C4.42 14.39 4.15 14.36 3.89 14.31C4.43 16 6 17.26 7.89 17.29C6.43 18.45 4.58 19.13 2.56 19.13C2.22 19.13 1.88 19.11 1.54 19.07C3.44 20.29 5.7 21 8.12 21C16 21 20.33 14.46 20.33 8.79C20.33 8.6 20.33 8.42 20.32 8.23C21.16 7.63 21.88 6.87 22.46 6Z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-photo">
+                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="David Wilson">
+                </div>
+                <h3>David Wilson</h3>
+                <p class="member-title">Head of Creator Relations</p>
+                <p class="member-bio">Dedicated to supporting creators with resources and opportunities to grow their personal brands and businesses.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM8 19H5V8H8V19ZM6.5 6.71C5.67 6.71 5 6.04 5 5.21C5 4.38 5.67 3.71 6.5 3.71C7.33 3.71 8 4.38 8 5.21C8 6.04 7.33 6.71 6.5 6.71ZM19 19H16V13.4C16 12.63 15.79 11.8 14.97 11.8C13.87 11.8 13.5 12.66 13.5 13.54V19H10.5V8H13.5V9.2C13.87 8.52 14.68 8 15.81 8C17.7 8 19 9.28 19 12.21V19Z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22.46 6C21.69 6.35 20.86 6.58 20 6.69C20.88 6.16 21.56 5.32 21.88 4.31C21.05 4.81 20.13 5.16 19.16 5.36C18.37 4.5 17.26 4 16 4C13.65 4 11.73 5.92 11.73 8.29C11.73 8.63 11.77 8.96 11.84 9.27C8.28 9.09 5.11 7.38 3 4.79C2.63 5.42 2.42 6.16 2.42 6.94C2.42 8.43 3.17 9.75 4.33 10.5C3.62 10.5 2.96 10.3 2.38 10V10.03C2.38 12.11 3.86 13.85 5.82 14.24C5.46 14.34 5.08 14.39 4.69 14.39C4.42 14.39 4.15 14.36 3.89 14.31C4.43 16 6 17.26 7.89 17.29C6.43 18.45 4.58 19.13 2.56 19.13C2.22 19.13 1.88 19.11 1.54 19.07C3.44 20.29 5.7 21 8.12 21C16 21 20.33 14.46 20.33 8.79C20.33 8.6 20.33 8.42 20.32 8.23C21.16 7.63 21.88 6.87 22.46 6Z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <div class="stat-card">
+            <h3>100,000+</h3>
+            <p>Active Creators</p>
+        </div>
+        <div class="stat-card">
+            <h3>5,000+</h3>
+            <p>Partner Businesses</p>
+        </div>
+        <div class="stat-card">
+            <h3>$50M+</h3>
+            <p>Creator Earnings</p>
+        </div>
+        <div class="stat-card">
+            <h3>30+</h3>
+            <p>Countries</p>
+        </div>
+    </div>
+
+    <div class="testimonials-section">
+        <h2>What People <span class="accent-text">Say</span></h2>
+        <div class="testimonial-slider">
+            <div class="testimonial">
+                <div class="testimonial-content">
+                    <p>"Social Influencers Connect has transformed my content creation from a hobby into a thriving business. The analytics tools helped me understand my audience better and attract the right brand partnerships."</p>
+                </div>
+                <div class="testimonial-author">
+                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80" alt="Emma Rodriguez">
+                    <div>
+                        <h4>Emma Rodriguez</h4>
+                        <p>Travel & Lifestyle Creator</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial">
+                <div class="testimonial-content">
+                    <p>"As a small business, we struggled to find the right influencers for our product launches. SIC made it simple to connect with authentic creators who actually care about our brand values and mission."</p>
+                </div>
+                <div class="testimonial-author">
+                    <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80" alt="Marcus Johnson">
+                    <div>
+                        <h4>Marcus Johnson</h4>
+                        <p>CEO, Eco Essentials</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="contact-section">
+        <h2>Get in <span class="accent-text">Touch</span></h2>
+        <div class="contact-methods">
+            <div class="contact-card">
+                <div class="contact-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <h3>Email Us</h3>
+                <p>hello@socialinfluencersconnect.com</p>
+            </div>
+            
+            <div class="contact-card">
+                <div class="contact-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM9 11H7V9H9V11ZM13 11H11V9H13V11ZM17 11H15V9H17V11Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <h3>Live Chat</h3>
+                <p>Available Monday-Friday, 9am-5pm ET</p>
+            </div>
+            
+            <div class="contact-card">
+                <div class="contact-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" fill="currentColor"/>
+                    </svg>
+                </div>
+                <h3>Support</h3>
+                <p>Visit our Help Center for FAQs and guides</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% comment %} <script>
+
+// JavaScript for about
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation class to elements as they appear in viewport
+    const observer = 
+
+</script> {% endcomment %}
+
+{% endblock content %}

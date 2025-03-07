@@ -1,0 +1,639 @@
+{% extends 'sic/base.html' %}
+
+{% comment %} {% block title %}For Influencers - Social Influencers Connect{% endblock %} {% endcomment %}
+{% load static %}
+{% block headcontent %}
+ {% comment %} <style>
+    .influencer-hero {
+        text-align: center;
+        padding: 80px 5% 40px;
+        background: linear-gradient(180deg, var(--primary-bg) 0%, #e8f0fb 100%);
+    }
+
+    .influencer-hero h1 {
+        font-size: 48px;
+        font-weight: 800;
+        margin-bottom: 20px;
+        background: linear-gradient(90deg, #293648 0%, #0d6efd 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientFlow 8s ease infinite;
+    }
+
+    @keyframes gradientFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .influencer-subtitle {
+        font-size: 20px;
+        max-width: 700px;
+        margin: 0 auto 40px;
+        color: var(--text-light);
+    }
+
+    .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin: 50px 0;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        text-align: center;
+        box-shadow: var(--box-shadow);
+        min-width: 200px;
+        transform: translateY(0);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(13, 110, 253, 0.15);
+    }
+
+    .stat-number {
+        font-size: 42px;
+        font-weight: 800;
+        color: #0d6efd;
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        color: var(--text-light);
+        font-weight: 500;
+    }
+
+    .benefits-section {
+        padding: 80px 5%;
+        background-color: var(--primary-bg);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 15px;
+    }
+
+    .section-header p {
+        color: var(--text-light);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .benefit-card {
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        box-shadow: var(--box-shadow);
+        transition: transform 0.3s, box-shadow 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .benefit-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .benefit-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(180deg, #0d6efd 0%, #83b8ff 100%);
+        border-radius: 5px 0 0 5px;
+    }
+
+    .benefit-icon {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 20px;
+        object-fit: contain;
+    }
+
+    .benefit-card h3 {
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: var(--text-dark);
+    }
+
+    .benefit-card p {
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+
+    .platforms-section {
+        padding: 80px 5%;
+        background-color: #f8fafc;
+        text-align: center;
+    }
+
+    .platform-logos {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 50px;
+        margin: 40px 0;
+    }
+
+    .platform-logo {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        transition: transform 0.3s;
+        filter: grayscale(100%);
+        opacity: 0.7;
+    }
+
+    .platform-logo:hover {
+        transform: scale(1.15);
+        filter: grayscale(0%);
+        opacity: 1;
+    }
+
+    .testimonials-section {
+        padding: 80px 5%;
+        background-color: var(--primary-bg);
+    }
+
+    .testimonial-carousel {
+        max-width: 900px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .testimonial-slide {
+        background-color: var(--box-bg);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        box-shadow: var(--box-shadow);
+        margin: 20px;
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: calc(100% - 40px);
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .testimonial-slide.active {
+        opacity: 1;
+        position: relative;
+    }
+
+    .testimonial-quote {
+        font-size: 18px;
+        line-height: 1.7;
+        margin-bottom: 30px;
+        color: var(--text-dark);
+        font-style: italic;
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+    }
+
+    .author-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-right: 15px;
+        object-fit: cover;
+    }
+
+    .author-info h4 {
+        margin: 0;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .author-info p {
+        margin: 5px 0 0;
+        color: var(--text-light);
+    }
+
+    .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .carousel-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #dbe1e8;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .carousel-dot.active {
+        background-color: #0d6efd;
+        transform: scale(1.2);
+    }
+
+    .cta-section {
+        text-align: center;
+        padding: 100px 5%;
+        background: linear-gradient(135deg, #f2f5f8 0%, #e4ecf7 100%);
+    }
+
+    .cta-button {
+        display: inline-block;
+        background: linear-gradient(90deg, #0d6efd 0%, #83b8ff 100%);
+        color: white;
+        font-weight: 600;
+        padding: 15px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        margin-top: 30px;
+    }
+
+    .cta-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(13, 110, 253, 0.3);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .influencer-hero h1 {
+            font-size: 36px;
+        }
+        
+        .stats-container {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .benefit-card {
+            margin-bottom: 20px;
+        }
+        
+        .testimonial-slide {
+            padding: 30px 20px;
+        }
+    }
+</style>  {% endcomment %}
+{% endblock %}
+
+{% block content %}
+<section class="business-section">
+<div class="influencer-hero">
+    <h1>Unlock Your Influence Potential</h1>
+    <p class="influencer-subtitle">Join thousands of content creators who are maximizing their reach, building authentic partnerships, and earning more from their online presence.</p>
+    
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-number">10K+</div>
+            <div class="stat-label">Active Influencers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">$2.5M</div>
+            <div class="stat-label">Creator Payouts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">5K+</div>
+            <div class="stat-label">Brand Partnerships</div>
+        </div>
+    </div>
+</div>
+
+<div class="benefits-section">
+    <div class="section-header">
+        <h2>Why Content Creators Choose SIC</h2>
+        <p>We've built a platform that puts creators first, with tools and opportunities designed to help you grow.</p>
+    </div>
+    
+    <div class="benefits-grid">
+        <div class="benefit-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/1792/1792931.png" alt="Data Analytics" class="benefit-icon">
+            <h3>Advanced Analytics</h3>
+            <p>Gain valuable insights into your audience demographics, content performance, and engagement metrics across all your connected platforms in one unified dashboard.</p>
+        </div>
+        
+        <div class="benefit-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/6615/6615375.png" alt="Brand Matching" class="benefit-icon">
+            <h3>Smart Brand Matching</h3>
+            <p>Our AI-powered algorithm connects you with brands that align with your content style, values, and audience interests for more authentic partnerships.</p>
+        </div>
+        
+        <div class="benefit-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/2942/2942269.png" alt="Revenue Streams" class="benefit-icon">
+            <h3>Multiple Revenue Streams</h3>
+            <p>Diversify your income with sponsored content, affiliate marketing, merchandise sales, and exclusive subscriber perks—all managed through one platform.</p>
+        </div>
+        
+        <div class="benefit-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/5956/5956592.png" alt="Collaboration Tools" class="benefit-icon">
+            <h3>Collaboration Tools</h3>
+            <p>Seamlessly communicate with brands, negotiate deals, and track deliverables with our built-in project management and messaging system.</p>
+        </div>
+        
+        <div class="benefit-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/9464/9464086.png" alt="Content Calendar" class="benefit-icon">
+            <h3>Content Calendar</h3>
+            <p>Plan, schedule, and optimize your content strategy across all platforms with our intuitive calendar tool that suggests the best posting times.</p>
+        </div>
+        
+        <div class="benefit-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/3891/3891710.png" alt="Creator Community" class="benefit-icon">
+            <h3>Creator Community</h3>
+            <p>Connect with like-minded creators, share tips, collaborate on projects, and grow together with access to our exclusive creator community.</p>
+        </div>
+    </div>
+</div>
+
+<div class="platforms-section">
+    <div class="section-header">
+        <h2>Connect All Your Platforms</h2>
+        <p>Integrate your social media accounts to maximize your reach and earnings potential.</p>
+    </div>
+    
+    <div class="platform-logos">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fc/YouTube_play_button_square_%282013-2017%29.svg" alt="YouTube" class="platform-logo">
+        <img src="https://img.freepik.com/free-vector/instagram-logo_1199-122.jpg?semt=ais_hybrid" alt="Instagram" class="platform-logo">
+        <img src="https://cdn.jim-nielsen.com/ios/512/facebook-2019-05-21.png?rf=1024" alt="Facebook" class="platform-logo">
+        <img src="https://img.freepik.com/free-vector/new-2023-twitter-logo-x-icon-design_1017-45418.jpg" alt="X" class="platform-logo">
+        <img src="https://cdn4.iconfinder.com/data/icons/social-media-flat-7/64/Social-media_Tiktok-512.png" alt="TikTok" class="platform-logo">
+        <img src="https://cdn-icons-png.flaticon.com/512/174/174881.png" alt="Twitch" class="platform-logo">
+    </div>
+</div>
+
+<div class="testimonials-section">
+    <div class="section-header">
+        <h2>Creator Success Stories</h2>
+        <p>Hear from content creators who have transformed their influence into sustainable businesses with SIC.</p>
+    </div>
+    
+    <div class="testimonial-carousel">
+        <div class="testimonial-slide active" id="testimonial-1">
+            <p class="testimonial-quote">"SIC transformed how I work with brands. The analytics helped me understand my true value, and I've increased my sponsorship rates by 70% in just 6 months!"</p>
+            <div class="testimonial-author">
+                <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Creator Portrait" class="author-avatar">
+                <div class="author-info">
+                    <h4>Sarah Johnson</h4>
+                    <p>Lifestyle & Fitness Creator, 180K followers</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="testimonial-slide" id="testimonial-2">
+            <p class="testimonial-quote">"The brand matching algorithm is incredibly accurate. I've found partnerships that truly resonate with my audience, leading to higher engagement and more authentic content."</p>
+            <div class="testimonial-author">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Creator Portrait" class="author-avatar">
+                <div class="author-info">
+                    <h4>Marcus Chen</h4>
+                    <p>Tech Reviewer, 420K subscribers</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="testimonial-slide" id="testimonial-3">
+            <p class="testimonial-quote">"As a micro-influencer, I struggled to get noticed by brands. SIC's platform gave me visibility, and now I'm earning consistently through multiple revenue streams."</p>
+            <div class="testimonial-author">
+                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Creator Portrait" class="author-avatar">
+                <div class="author-info">
+                    <h4>Priya Patel</h4>
+                    <p>Beauty Content Creator, 45K followers</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="carousel-dots">
+            <div class="carousel-dot active" data-slide="testimonial-1"></div>
+            <div class="carousel-dot" data-slide="testimonial-2"></div>
+            <div class="carousel-dot" data-slide="testimonial-3"></div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <div class="section-header">
+        <h2>Ready to Amplify Your Influence?</h2>
+        <p>Join thousands of creators who are growing their audience and increasing their income with SIC.</p>
+    </div>
+    
+    <div class="pricing-section">
+        {% comment %} <div class="section-header">
+            <h2>Simple, Transparent Pricing</h2>
+            <p>Choose the plan that works best for your business needs with no hidden fees or long-term commitments.</p>
+        </div> {% endcomment %}
+        
+        <div class="pricing-tiers">
+            <div class="pricing-tier">
+                <div class="tier-name">Starter</div>
+                <div class="tier-price">$499</div>
+                <div class="tier-billing">per month</div>
+                
+                <div class="tier-features">
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">10 influencer connections per month</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Basic analytics dashboard</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Campaign management tools</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Email support</span>
+                    </div>
+                </div>
+                
+                <button class="tier-cta tier-secondary">Get Started</button>
+            </div>
+            
+            <div class="pricing-tier">
+                <div class="tier-popular">MOST POPULAR</div>
+                <div class="tier-name">Professional</div>
+                <div class="tier-price">$999</div>
+                <div class="tier-billing">per month</div>
+                
+                <div class="tier-features">
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">30 influencer connections per month</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Advanced analytics & reporting</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Content approval workflow</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Campaign ROI tracking</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Priority support</span>
+                    </div>
+                </div>
+                
+                <button class="tier-cta">Get Started</button>
+            </div>
+            
+            <div class="pricing-tier">
+                <div class="tier-name">Enterprise</div>
+                <div class="tier-price">Custom</div>
+                <div class="tier-billing">tailored solution</div>
+                
+                <div class="tier-features">
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Unlimited influencer connections</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Custom reporting & API access</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">White-label solutions</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">Dedicated account manager</span>
+                    </div>
+                    <div class="tier-feature">
+                        <span class="feature-icon">✓</span>
+                        <span class="feature-text">24/7 premium support</span>
+                    </div>
+                </div>
+                
+                <button class="tier-cta tier-secondary">Contact Sales</button>
+            </div>
+        </div>
+    </div>
+    
+</div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Stats counter animation
+        const statNumbers = document.querySelectorAll('.stat-number');
+        
+        statNumbers.forEach(stat => {
+            const target = stat.innerText;
+            const suffix = target.includes('K') ? 'K+' : (target.includes('M') ? 'M' : '');
+            const numTarget = parseFloat(target.replace(/[^\d.-]/g, ''));
+            const duration = 2000; // ms
+            const increment = numTarget / (duration / 16);
+            let current = 0;
+            
+            stat.innerText = '0' + suffix;
+            
+            const updateCounter = () => {
+                current += increment;
+                if (current < numTarget) {
+                    stat.innerText = (suffix === 'M' ? current.toFixed(1) : Math.round(current)) + suffix;
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    stat.innerText = target;
+                }
+            };
+            
+            // Start animation when element is in viewport
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        requestAnimationFrame(updateCounter);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            observer.observe(stat);
+        });
+        
+        // Testimonial carousel
+        const slides = document.querySelectorAll('.testimonial-slide');
+        const dots = document.querySelectorAll('.carousel-dot');
+        let currentSlide = 0;
+        
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentSlide = index;
+        }
+        
+        // Click on dots to change slide
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+            });
+        });
+        
+        // Auto-rotate slides every 5 seconds
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }, 5000);
+        
+        // CTA button effect
+        const ctaButton = document.getElementById('influencer-signup-btn');
+        
+        ctaButton.addEventListener('click', function() {
+            this.classList.add('pulse');
+            
+            // Open signup modal
+            if (typeof openModal === 'function' && document.getElementById('userTypeModal')) {
+                setTimeout(() => {
+                    openModal(document.getElementById('userTypeModal'));
+                    
+                    // Pre-select creator option if possible
+                    const creatorOption = document.querySelector('.user-type-option[data-type="creator"]');
+                    if (creatorOption) {
+                        creatorOption.click();
+                    }
+                }, 400);
+            }
+            
+            // Remove animation after it completes
+            setTimeout(() => {
+                this.classList.remove('pulse');
+            }, 400);
+        });
+    });
+</script>
+{% endblock %}
