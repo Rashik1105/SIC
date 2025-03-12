@@ -2,191 +2,1821 @@
 
 {% block content %}
 <div class="profile-container">
-    <h2 class="profile-heading">👤 Profile Page</h2>
-
-    <!-- Display Success Messages -->
-    {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-                <p class="{{ message.tags }}">{{ message }}</p>
-            {% endfor %}
+    <div class="sidebar">
+        <div class="profile-avatar">
+            <div class="avatar-container">
+                <img src="{% static 'images/default-avatar.png' %}" alt="User Avatar">
+                <div class="edit-overlay">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            <h2>{{ user.name }}</h2>
+            <p class="username">@{{ user.username|default:"username" }}</p>
+            <span class="status-badge {{ user.status|lower }}">{{ user.status }}</span>
         </div>
-    {% endif %}
-
-    <!-- YouTube User Profile -->
-    {% if youtube_user %}
-    <div class="profile-card">
-        <h3 class="section-title">🎥 YouTube Profile</h3>
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ youtube_form.as_p }}
-            </div>
-            <button type="submit" class="save-btn">💾 Save Changes</button>
-        </form>
-    </div>
-
-    <div class="social-links">
-        <h3 class="section-title">🔗 Link Social Media Accounts</h3>
-        <div class="social-buttons">
-            <div class="social-item">
-                {% if youtube_user.instagram_id %}
-                    ✅ <strong>Instagram Linked</strong>
-                {% else %}
-                    <a href="{% url 'link_meta' %}" class="link-button instagram">📷 Link Instagram</a>
-                {% endif %}
-            </div>
-
-            <div class="social-item">
-                {% if youtube_user.facebook_id %}
-                    ✅ <strong>Facebook Linked</strong>
-                {% else %}
-                    <a href="{% url 'link_meta' %}" class="link-button facebook">📘 Link Facebook</a>
-                {% endif %}
-            </div>
-
-            <div class="social-item">
-                {% if youtube_user.x_id %}
-                    ✅ <strong>X (Twitter) Linked</strong>
-                {% else %}
-                    <a href="{% url 'link_x' %}" class="link-button twitter">🐦 Link X (Twitter)</a>
-                {% endif %}
-            </div>
+        
+        <nav class="profile-nav">
+            <a href="#overview" class="nav-item active" data-tab="overview">
+                <i class="fas fa-user"></i> Overview
+            </a>
+            <a href="#statistics" class="nav-item" data-tab="statistics">
+                <i class="fas fa-chart-line"></i> Statistics
+            </a>
+            <a href="#edit-profile" class="nav-item" data-tab="edit-profile">
+                <i class="fas fa-edit"></i> Edit Profile
+            </a>
+            <a href="#social-accounts" class="nav-item" data-tab="social-accounts">
+                <i class="fas fa-share-alt"></i> Social Accounts
+            </a>
+            <a href="#campaigns" class="nav-item" data-tab="campaigns">
+                <i class="fas fa-ad"></i> Campaigns
+            </a>
+            <a href="#activity" class="nav-item" data-tab="activity">
+                <i class="fas fa-history"></i> Activity
+            </a>
+        </nav>
+        
+        <div class="logout-section">
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
         </div>
     </div>
-    {% endif %}
-
-    <!-- Business Profile -->
-    {% if business_profile %}
-    <div class="profile-card">
-        <h3 class="section-title">🏢 Business Profile</h3>
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ business_form.as_p }}
+    
+    <div class="main-content">
+        <!-- Overview Tab -->
+        <section id="overview" class="tab-content active">
+            <div class="section-header">
+                <h1>Influencer Dashboard</h1>
+                <div class="quick-actions">
+                    <button class="action-btn"><i class="fas fa-bell"></i></button>
+                    <button class="action-btn"><i class="fas fa-cog"></i></button>
+                </div>
             </div>
-            <button type="submit" class="save-btn">💾 Save Changes</button>
-        </form>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>Available Balance</h3>
+                        <p class="stat-value">$1,275</p>
+                        <span class="stat-trend positive"><i class="fas fa-arrow-up"></i> 12.5%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>Pending Withdrawal</h3>
+                        <p class="stat-value">$450</p>
+                        <span class="stat-trend pending">Processing</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>Active Campaigns</h3>
+                        <p class="stat-value">7</p>
+                        <span class="stat-trend positive"><i class="fas fa-arrow-up"></i> 2</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>Rating</h3>
+                        <p class="stat-value">4.8/5</p>
+                        <span class="stat-trend positive"><i class="fas fa-arrow-up"></i> 0.2</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-row">
+                <div class="recent-campaigns">
+                    <div class="section-title">
+                        <h3>Recent Campaigns</h3>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    <div class="campaign-list">
+                        <div class="campaign-item">
+                            <img src="{% static 'images/brand-logo1.png' %}" alt="Brand Logo" class="brand-logo">
+                            <div class="campaign-details">
+                                <h4>Fashion Nova Summer Collection</h4>
+                                <p>Instagram Post & Story</p>
+                                <div class="campaign-progress">
+                                    <div class="progress-bar" style="width: 75%"></div>
+                                </div>
+                                <span class="campaign-status">In Progress - 75%</span>
+                            </div>
+                            <div class="campaign-amount">$350</div>
+                        </div>
+                        
+                        <div class="campaign-item">
+                            <img src="{% static 'images/brand-logo2.png' %}" alt="Brand Logo" class="brand-logo">
+                            <div class="campaign-details">
+                                <h4>Tech Gadget Review</h4>
+                                <p>YouTube Video</p>
+                                <div class="campaign-progress">
+                                    <div class="progress-bar" style="width: 100%"></div>
+                                </div>
+                                <span class="campaign-status completed">Completed</span>
+                            </div>
+                            <div class="campaign-amount">$500</div>
+                        </div>
+                        
+                        <div class="campaign-item">
+                            <img src="{% static 'images/brand-logo3.png' %}" alt="Brand Logo" class="brand-logo">
+                            <div class="campaign-details">
+                                <h4>Fitness App Promotion</h4>
+                                <p>TikTok & Instagram Reels</p>
+                                <div class="campaign-progress">
+                                    <div class="progress-bar" style="width: 30%"></div>
+                                </div>
+                                <span class="campaign-status">In Progress - 30%</span>
+                            </div>
+                            <div class="campaign-amount">$425</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="performance-chart">
+                    <div class="section-title">
+                        <h3>Performance Analytics</h3>
+                        <div class="chart-controls">
+                            <button class="chart-period active">Week</button>
+                            <button class="chart-period">Month</button>
+                            <button class="chart-period">Year</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Statistics Tab -->
+        <section id="statistics" class="tab-content">
+            <div class="section-header">
+                <h1>Performance Statistics</h1>
+                <div class="filter-controls">
+                    <select class="period-select">
+                        <option>Last 7 Days</option>
+                        <option>Last 30 Days</option>
+                        <option>Last 3 Months</option>
+                        <option>Last Year</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="stats-cards">
+                <div class="metric-card">
+                    <h3>Total Earnings</h3>
+                    <p class="metric-value">$12,450</p>
+                    <div class="metric-chart">
+                        <canvas id="earningsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <h3>Campaign Completion</h3>
+                    <p class="metric-value">85%</p>
+                    <div class="metric-chart">
+                        <canvas id="completionChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <h3>Engagement Rate</h3>
+                    <p class="metric-value">4.2%</p>
+                    <div class="metric-chart">
+                        <canvas id="engagementChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <h3>Brand Collaborations</h3>
+                    <p class="metric-value">24</p>
+                    <div class="metric-chart">
+                        <canvas id="collaborationsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="performance-breakdown">
+                <h3>Platform Performance</h3>
+                <div class="platform-stats">
+                    <div class="platform">
+                        <i class="fab fa-instagram"></i>
+                        <div class="platform-details">
+                            <h4>Instagram</h4>
+                            <div class="platform-metrics">
+                                <span>Followers: 32.5K</span>
+                                <span>Engagement: 3.8%</span>
+                                <span>Campaigns: 12</span>
+                            </div>
+                            <div class="platform-growth">
+                                <div class="growth-bar" style="width: 78%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="platform">
+                        <i class="fab fa-tiktok"></i>
+                        <div class="platform-details">
+                            <h4>TikTok</h4>
+                            <div class="platform-metrics">
+                                <span>Followers: 45.2K</span>
+                                <span>Engagement: 5.1%</span>
+                                <span>Campaigns: 8</span>
+                            </div>
+                            <div class="platform-growth">
+                                <div class="growth-bar" style="width: 92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="platform">
+                        <i class="fab fa-youtube"></i>
+                        <div class="platform-details">
+                            <h4>YouTube</h4>
+                            <div class="platform-metrics">
+                                <span>Subscribers: 18.7K</span>
+                                <span>Engagement: 4.5%</span>
+                                <span>Campaigns: 6</span>
+                            </div>
+                            <div class="platform-growth">
+                                <div class="growth-bar" style="width: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Edit Profile Tab -->
+        <section id="edit-profile" class="tab-content">
+            <div class="section-header">
+                <h1>Edit Profile</h1>
+            </div>
+            
+            <form class="profile-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-columns">
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" value="{{ user.name }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" value="{{ user.username|default:'' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" value="{{ user.phone|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="bio">Bio</label>
+                            <textarea id="bio" name="bio" rows="4">{{ user.bio|default:'' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="niche">Content Niche</label>
+                            <select id="niche" name="niche">
+                                <option {% if user.niche == "Fashion" %}selected{% endif %}>Fashion</option>
+                                <option {% if user.niche == "Beauty" %}selected{% endif %}>Beauty</option>
+                                <option {% if user.niche == "Fitness" %}selected{% endif %}>Fitness</option>
+                                <option {% if user.niche == "Travel" %}selected{% endif %}>Travel</option>
+                                <option {% if user.niche == "Food" %}selected{% endif %}>Food</option>
+                                <option {% if user.niche == "Tech" %}selected{% endif %}>Tech</option>
+                                <option {% if user.niche == "Lifestyle" %}selected{% endif %}>Lifestyle</option>
+                                <option {% if user.niche == "Gaming" %}selected{% endif %}>Gaming</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" name="location" value="{{ user.location|default:'' }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="password-section">
+                    <h3>Change Password</h3>
+                    <div class="form-group">
+                        <label for="current_password">Current Password</label>
+                        <input type="password" id="current_password" name="current_password">
+                    </div>
+                    
+                    <div class="password-row">
+                        <div class="form-group">
+                            <label for="new_password">New Password</label>
+                            <input type="password" id="new_password" name="new_password">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm New Password</label>
+                            <input type="password" id="confirm_password" name="confirm_password">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="save-btn">Save Changes</button>
+                    <button type="reset" class="reset-btn">Reset</button>
+                </div>
+            </form>
+        </section>
+        
+        <!-- Social Accounts Tab -->
+        <section id="social-accounts" class="tab-content">
+            <div class="section-header">
+                <h1>Social Media Accounts</h1>
+                <p class="section-desc">Link your social media accounts to showcase your audience reach to brands</p>
+            </div>
+            
+            <div class="social-accounts-container">
+                <div class="social-card">
+                    <div class="social-icon instagram">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                    <div class="social-info">
+                        <h3>Instagram</h3>
+                        {% if user.instagram_id %}
+                            <p class="connected">@{{ user.instagram_username }}</p>
+                            <span class="followers">32.5K Followers</span>
+                            <button class="disconnect-btn">Disconnect</button>
+                        {% else %}
+                            <p class="not-connected">Not Connected</p>
+                            <a href="{% url 'link_instagram' %}" class="connect-btn">Connect Account</a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="social-card">
+                    <div class="social-icon tiktok">
+                        <i class="fab fa-tiktok"></i>
+                    </div>
+                    <div class="social-info">
+                        <h3>TikTok</h3>
+                        {% if user.tiktok_id %}
+                            <p class="connected">@{{ user.tiktok_username }}</p>
+                            <span class="followers">45.2K Followers</span>
+                            <button class="disconnect-btn">Disconnect</button>
+                        {% else %}
+                            <p class="not-connected">Not Connected</p>
+                            <a href="{% url 'link_tiktok' %}" class="connect-btn">Connect Account</a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="social-card">
+                    <div class="social-icon youtube">
+                        <i class="fab fa-youtube"></i>
+                    </div>
+                    <div class="social-info">
+                        <h3>YouTube</h3>
+                        {% if user.youtube_id %}
+                            <p class="connected">{{ user.youtube_channel }}</p>
+                            <span class="followers">18.7K Subscribers</span>
+                            <button class="disconnect-btn">Disconnect</button>
+                        {% else %}
+                            <p class="not-connected">Not Connected</p>
+                            <a href="{% url 'link_youtube' %}" class="connect-btn">Connect Account</a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="social-card">
+                    <div class="social-icon twitter">
+                        <i class="fab fa-twitter"></i>
+                    </div>
+                    <div class="social-info">
+                        <h3>Twitter</h3>
+                        {% if user.twitter_id %}
+                            <p class="connected">@{{ user.twitter_username }}</p>
+                            <span class="followers">12.3K Followers</span>
+                            <button class="disconnect-btn">Disconnect</button>
+                        {% else %}
+                            <p class="not-connected">Not Connected</p>
+                            <a href="{% url 'link_twitter' %}" class="connect-btn">Connect Account</a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="social-card">
+                    <div class="social-icon facebook">
+                        <i class="fab fa-facebook"></i>
+                    </div>
+                    <div class="social-info">
+                        <h3>Facebook</h3>
+                        {% if user.facebook_id %}
+                            <p class="connected">{{ user.facebook_name }}</p>
+                            <span class="followers">8.5K Followers</span>
+                            <button class="disconnect-btn">Disconnect</button>
+                        {% else %}
+                            <p class="not-connected">Not Connected</p>
+                            <a href="{% url 'link_facebook' %}" class="connect-btn">Connect Account</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="social-insights">
+                <h3>Audience Demographics</h3>
+                <div class="demographics-charts">
+                    <div class="demo-chart">
+                        <h4>Age Distribution</h4>
+                        <canvas id="ageChart"></canvas>
+                    </div>
+                    
+                    <div class="demo-chart">
+                        <h4>Gender Distribution</h4>
+                        <canvas id="genderChart"></canvas>
+                    </div>
+                    
+                    <div class="demo-chart">
+                        <h4>Geographic Distribution</h4>
+                        <canvas id="geoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Campaigns Tab -->
+        <section id="campaigns" class="tab-content">
+            <div class="section-header">
+                <h1>Campaign Management</h1>
+                <div class="campaign-filters">
+                    <select class="campaign-filter">
+                        <option value="all">All Campaigns</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                    <button class="filter-btn"><i class="fas fa-filter"></i> Filter</button>
+                </div>
+            </div>
+            
+            <div class="campaigns-list">
+                <div class="campaign-card active">
+                    <div class="campaign-header">
+                        <img src="{% static 'images/brand-logo1.png' %}" alt="Brand Logo" class="campaign-brand">
+                        <div class="campaign-tags">
+                            <span class="tag active">Active</span>
+                            <span class="tag platform">Instagram</span>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-body">
+                        <h3>Fashion Nova Summer Collection</h3>
+                        <p class="campaign-desc">Promote our new summer collection with a post and story highlight showcasing your favorite outfits.</p>
+                        
+                        <div class="campaign-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar"></i>
+                                <span>Due: Mar 15, 2025</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>$350</span>
+                            </div>
+                        </div>
+                        
+                        <div class="campaign-progress-container">
+                            <div class="progress-label">
+                                <span>Progress</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="campaign-progress-bar">
+                                <div class="progress-fill" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-footer">
+                        <button class="campaign-btn primary">Update Status</button>
+                        <button class="campaign-btn secondary">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="campaign-card completed">
+                    <div class="campaign-header">
+                        <img src="{% static 'images/brand-logo2.png' %}" alt="Brand Logo" class="campaign-brand">
+                        <div class="campaign-tags">
+                            <span class="tag completed">Completed</span>
+                            <span class="tag platform">YouTube</span>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-body">
+                        <h3>Tech Gadget Review</h3>
+                        <p class="campaign-desc">Create a detailed review of our new smartphone, highlighting key features and your honest opinion.</p>
+                        
+                        <div class="campaign-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar-check"></i>
+                                <span>Completed: Feb 28, 2025</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>$500</span>
+                            </div>
+                        </div>
+                        
+                        <div class="campaign-progress-container">
+                            <div class="progress-label">
+                                <span>Progress</span>
+                                <span>100%</span>
+                            </div>
+                            <div class="campaign-progress-bar">
+                                <div class="progress-fill completed" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-footer">
+                        <button class="campaign-btn secondary">View Analytics</button>
+                        <button class="campaign-btn secondary">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="campaign-card active">
+                    <div class="campaign-header">
+                        <img src="{% static 'images/brand-logo3.png' %}" alt="Brand Logo" class="campaign-brand">
+                        <div class="campaign-tags">
+                            <span class="tag active">Active</span>
+                            <span class="tag platform">TikTok</span>
+                            <span class="tag platform">Instagram</span>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-body">
+                        <h3>Fitness App Promotion</h3>
+                        <p class="campaign-desc">Create short form videos showcasing workout routines using our fitness app on both TikTok and Instagram Reels.</p>
+                        
+                        <div class="campaign-meta">
+                            <div class="meta-item">
+                                <i class="far fa-calendar"></i>
+                                <span>Due: Mar 25, 2025</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>$425</span>
+                            </div>
+                        </div>
+                        
+                        <div class="campaign-progress-container">
+                            <div class="progress-label">
+                                <span>Progress</span>
+                                <span>30%</span>
+                            </div>
+                            <div class="campaign-progress-bar">
+                                <div class="progress-fill" style="width: 30%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-footer">
+                        <button class="campaign-btn primary">Update Status</button>
+                        <button class="campaign-btn secondary">View Details</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="campaigns-opportunities">
+                <h3>Suggested Opportunities</h3>
+                <div class="opportunities-list">
+                    <div class="opportunity-card">
+                        <img src="{% static 'images/brand-logo4.png' %}" alt="Brand Logo" class="opportunity-logo">
+                        <div class="opportunity-details">
+                            <h4>BeautyGlow Skincare</h4>
+                            <p>Looking for beauty influencers to promote our new natural skincare line</p>
+                            <div class="opportunity-meta">
+                                <span><i class="fas fa-tag"></i> $300-500</span>
+                                <span><i class="fab fa-instagram"></i> Instagram</span>
+                            </div>
+                        </div>
+                        <button class="apply-btn">Apply Now</button>
+                    </div>
+                    
+                    <div class="opportunity-card">
+                        <img src="{% static 'images/brand-logo5.png' %}" alt="Brand Logo" class="opportunity-logo">
+                        <div class="opportunity-details">
+                            <h4>EcoFriendly Home Products</h4>
+                            <p>Seeking lifestyle creators to showcase our sustainable home products</p>
+                            <div class="opportunity-meta">
+                                <span><i class="fas fa-tag"></i> $250-400</span>
+                                <span><i class="fab fa-youtube"></i> YouTube</span>
+                            </div>
+                        </div>
+                        <button class="apply-btn">Apply Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Activity Tab -->
+        <section id="activity" class="tab-content">
+            <div class="section-header">
+                <h1>Activity Log</h1>
+            </div>
+            
+            <div class="activity-timeline">
+                {% for log in user.activity_logs %}
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        {% if 'login' in log.activity|lower %}
+                            <i class="fas fa-sign-in-alt"></i>
+                        {% elif 'update' in log.activity|lower %}
+                            <i class="fas fa-edit"></i>
+                        {% elif 'campaign' in log.activity|lower %}
+                            <i class="fas fa-bullhorn"></i>
+                        {% elif 'payment' in log.activity|lower %}
+                            <i class="fas fa-money-bill-wave"></i>
+                        {% else %}
+                            <i class="fas fa-circle"></i>
+                        {% endif %}
+                    </div>
+                    <div class="timeline-content">
+                        <h4>{{ log.activity }}</h4>
+                        <p class="timeline-date"><i class="far fa-clock"></i> {{ log.date }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-activity">
+                    <i class="fas fa-history"></i>
+                    <p>No activity logged yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
     </div>
-    {% endif %}
 </div>
 
 <style>
-    /* General Page Styling */
+    /* Core Styles */
+    :root {
+        --primary-bg: #000000;
+        --secondary-bg: #111111;
+        --card-bg: #1a1a1a;
+        --border-color: #333333;
+        --text-primary: #ffffff;
+        --text-secondary: #aaaaaa;
+        --accent-color: #ffffff;
+        --success-color: #4CAF50;
+        --warning-color: #FFC107;
+        --danger-color: #F44336;
+        --info-color: #2196F3;
+        --border-radius: 10px;
+        --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        --transition-speed: 0.3s;
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        background-color: var(--primary-bg);
+        color: var(--text-primary);
+    }
+    
+    /* Layout */
     .profile-container {
-        max-width: 750px;
-        margin: 40px auto;
-        background: #fff;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        font-family: 'Poppins', sans-serif;
-        animation: fadeIn 0.5s ease-in-out;
+        display: flex;
+        max-width: 1400px;
+        margin: 30px auto;
+        background: var(--primary-bg);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        min-height: 85vh;
     }
     
-    .profile-heading {
-        text-align: center;
-        color: #222;
-        font-size: 28px;
-        margin-bottom: 20px;
-        font-weight: 600;
+    .sidebar {
+        width: 260px;
+        background-color: var(--secondary-bg);
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        padding: 30px 0;
     }
-
-    /* Profile Card Styling */
-    .profile-card {
-        background: #f9f9f9;
+    
+    .main-content {
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+        background-color: var(--primary-bg);
+    }
+    
+    /* Profile Avatar Section */
+    .profile-avatar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        transition: 0.3s ease-in-out;
-    }
-
-    .profile-card:hover {
-        background: #f0f0f0;
-        transform: scale(1.02);
-    }
-
-    .section-title {
-        font-size: 20px;
-        margin-bottom: 10px;
-        color: #444;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 5px;
-        font-weight: 500;
+        border-bottom: 1px solid var(--border-color);
     }
     
-    form p {
-        margin: 10px 0;
-        font-size: 16px;
+    .avatar-container {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        margin-bottom: 15px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid var(--accent-color);
+        transition: transform var(--transition-speed);
     }
-
-    /* Save Button */
-    .save-btn {
-        background: #28a745;
-        color: white;
-        padding: 10px 18px;
-        border: none;
-        border-radius: 6px;
-        font-size: 18px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: 0.3s;
-        display: block;
-        width: 100%;
-        text-align: center;
-    }
-
-    .save-btn:hover {
-        background: #218838;
+    
+    .avatar-container:hover {
         transform: scale(1.05);
     }
-
-    /* Social Media Links */
-    .social-links {
-        background: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        border: 2px solid #ddd;
+    
+    .avatar-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
-
-    .social-buttons {
+    
+    .edit-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
         display: flex;
         justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
+        align-items: center;
+        opacity: 0;
+        transition: opacity var(--transition-speed);
+        cursor: pointer;
     }
     
-    .social-item {
-        margin: 8px 0;
-        font-size: 16px;
+    .avatar-container:hover .edit-overlay {
+        opacity: 1;
     }
-
-    .link-button {
-        display: inline-block;
-        padding: 10px 18px;
-        border-radius: 8px;
-        color: white;
+    
+    .profile-avatar h2 {
+        margin: 5px 0;
+        font-size: 1.2rem;
+        text-align: center;
+    }
+    
+    .username {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        background-color: var(--card-bg);
+    }
+    
+    .status-badge.active {
+        background-color: var(--success-color);
+    }
+    
+    .status-badge.pending {
+        background-color: var(--warning-color);
+        color: #000;
+    }
+    
+    /* Navigation */
+    .profile-nav {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 25px;
+        color: var(--text-primary);
         text-decoration: none;
+        transition: background-color var(--transition-speed);
+        margin: 3px 10px;
+        border-radius: 8px;
+    }
+    
+    .nav-item i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+        min-width: 20px;
+        text-align: center;
+    }
+    
+    .nav-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-item.active {
+        background-color: var(--accent-color);
+        color: var(--primary-bg);
         font-weight: 600;
-        transition: 0.3s;
     }
-
-    .instagram { background: #E1306C; }
-    .facebook { background: #1877F2; }
-    .twitter { background: #1DA1F2; }
-
-    .link-button:hover {
-        opacity: 0.85;
-        transform: scale(1.05);
+    
+    .logout-section {
+        padding: 20px;
+        border-top: 1px solid var(--border-color);
     }
-
-    /* Animation */
+    
+    .logout-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        width: 100%;
+        background-color: transparent;
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all var(--transition-speed);
+        text-decoration: none;
+    }
+    
+    .logout-btn i {
+        margin-right: 8px;
+    }
+    
+    .logout-btn:hover {
+        background-color: rgba(244, 67, 54, 0.1);
+        border-color: var(--danger-color);
+        color: var(--danger-color);
+    }
+    
+    /* Tab Content */
+    .tab-content {
+        display: none;
+        animation: fadeIn var(--transition-speed);
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-
+    
+    /* Section Headers */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .section-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    
+    .quick-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .action-btn {
+        background-color: var(--card-bg);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all var(--transition-speed);
+    }
+    
+    .action-btn:hover {
+        background-color: var(--accent-color);
+        color: var(--primary-bg);
+    }
+    
+    .section-desc {
+        color: var(--text-secondary);
+        margin-top: 5px;
+    }
+    
+    /* Stats Cards */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        box-shadow: var(--card-shadow);
+        transition: transform var(--transition-speed);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 1.5rem;
+    }
+    
+    .stat-details h3 {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    
+    .stat-trend {
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .stat-trend.positive {
+        color: var(--success-color);
+    }
+    
+    .stat-trend.negative {
+        color: var(--danger-color);
+    }
+    
+    .stat-trend.pending {
+        color: var(--warning-color);
+    }
+    
+    .stat-trend i {
+        margin-right: 5px;
+    }
+    
+    /* Content Row Layout */
+    .content-row {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    /* Recent Campaigns */
+    .recent-campaigns {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .section-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .section-title h3 {
+        font-size: 1.1rem;
+    }
+    
+    .view-all {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .campaign-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .campaign-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        transition: transform var(--transition-speed);
+    }
+    
+    .campaign-item:hover {
+        transform: translateX(5px);
+    }
+    
+    .brand-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        margin-right: 15px;
+        object-fit: cover;
+    }
+    
+    .campaign-details {
+        flex-grow: 1;
+    }
+    
+    .campaign-details h4 {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+    
+    .campaign-details p {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 10px;
+    }
+    
+    .campaign-progress {
+        height: 5px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        margin-bottom: 5px;
+        overflow: hidden;
+    }
+    
+    .campaign-progress .progress-bar {
+        height: 100%;
+        background-color: var(--accent-color);
+    }
+    
+    .campaign-status {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+    
+    .campaign-status.completed {
+        color: var(--success-color);
+    }
+    
+    .campaign-amount {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-left: 15px;
+    }
+    
+    /* Performance Chart */
+    .performance-chart {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .chart-controls {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .chart-period {
+        background: none;
+        border: 1px solid var(--border-color);
+        padding: 5px 12px;
+        border-radius: 5px;
+        color: var(--text-primary);
+        cursor: pointer;
+        font-size: 0.8rem;
+    }
+    
+    .chart-period.active {
+        background-color: var(--accent-color);
+        color: var(--primary-bg);
+        border-color: var(--accent-color);
+    }
+    
+    .chart-container {
+        margin-top: 20px;
+        height: 250px;
+    }
+    
+    /* Form Styling */
+    .profile-form {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .form-columns {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        transition: border-color var(--transition-speed);
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: var(--accent-color);
+        outline: none;
+    }
+    
+    .password-section {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .password-section h3 {
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+    
+    .password-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+    }
+    
+    .save-btn, .reset-btn {
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition-speed);
+    }
+    
+    .save-btn {
+        background-color: var(--accent-color);
+        color: var(--primary-bg);
+        border: none;
+    }
+    
+    .save-btn:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .reset-btn {
+        background-color: transparent;
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+    
+    .reset-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Social Accounts Section */
+    .social-accounts-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .social-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .social-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 15px;
+    }
+    
+    .social-icon.instagram {
+        background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    }
+    
+    .social-icon.facebook {
+        background-color: #1877F2;
+    }
+    
+    .social-icon.twitter {
+        background-color: #1DA1F2;
+    }
+    
+    .social-icon.tiktok {
+        background-color: #000000;
+    }
+    
+    .social-icon.youtube {
+        background-color: #FF0000;
+    }
+    
+    .social-info {
+        flex-grow: 1;
+    }
+    
+    .social-info h3 {
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+    
+    .social-info .connected {
+        color: var(--success-color);
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .social-info .not-connected {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .followers {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 10px;
+    }
+    
+    .connect-btn, .disconnect-btn {
+        padding: 6px 12px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all var(--transition-speed);
+    }
+    
+    .connect-btn {
+        background-color: var(--accent-color);
+        color: var(--primary-bg);
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .disconnect-btn {
+        background-color: transparent;
+        color: var(--danger-color);
+        border: 1px solid var(--danger-color);
+    }
+    
+    .connect-btn:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .disconnect-btn:hover {
+        background-color: rgba(244, 67, 54, 0.1);
+    }
+    
+    /* Social Insights */
+    .social-insights {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        margin-top: 30px;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .social-insights h3 {
+        margin-bottom: 20px;
+    }
+    
+    .demographics-charts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .demo-chart {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+    }
+    
+    .demo-chart h4 {
+        margin-bottom: 15px;
+        font-size: 1rem;
+        color: var(--text-secondary);
+    }
+    
+    /* Campaign Cards */
+    .campaigns-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .campaign-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        transition: transform var(--transition-speed);
+    }
+    
+    .campaign-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .campaign-header {
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .campaign-brand {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+    
+    .campaign-tags {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .tag {
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+    }
+    
+    .tag.active {
+        background-color: var(--success-color);
+    }
+    
+    .tag.completed {
+        background-color: var(--info-color);
+    }
+    
+    .tag.platform {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .campaign-body {
+        padding: 20px;
+    }
+    
+    .campaign-body h3 {
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+    }
+    
+    .campaign-desc {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        line-height: 1.4;
+    }
+    
+    .campaign-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+    }
+    
+    .meta-item i {
+        margin-right: 5px;
+    }
+    
+    .campaign-progress-container {
+        margin-bottom: 10px;
+    }
+    
+    .progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+    }
+    
+    .campaign-progress-bar {
+        height: 6px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background-color: var(--accent-color);
+    }
+    
+    .progress-fill.completed {
+        background-color: var(--success-color);
+    }
+    
+    .campaign-footer {
+        padding: 15px 20px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .campaign-btn {
+        padding: 8px 15px;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all var(--transition-speed);
+    }
+    
+    .campaign-btn.primary {
+        background-color: var(--accent-color);
+        color: var(--primary-bg);
+        border: none;
+    }
+    
+    .campaign-btn.secondary {
+        background-color: transparent;
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+    
+    .campaign-btn.primary:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .campaign-btn.secondary:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Opportunity Cards */
+    .campaigns-opportunities {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .campaigns-opportunities h3 {
+        margin-bottom: 15px;
+    }
+    
+    .opportunities-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 15px;
+    }
+    
+    .opportunity-card {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        transition: transform var(--transition-speed);
+    }
+    
+    .opportunity-card:hover {
+        transform: translateX(5px);
+    }
+    
+    .opportunity-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        margin-right: 15px;
+    }
+    
+    .opportunity-details {
+        flex-grow: 1;
+    }
+    
+    .opportunity-details h4 {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+    
+    .opportunity-details p {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+    
+    .opportunity-meta {
+        display: flex;
+        gap: 15px;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+    
+    .apply-btn {
+        background-color: var(--accent-color);
+        color: var(--primary-bg);
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color var(--transition-speed);
+    }
+    
+    .apply-btn:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+    
+    /* Activity Timeline */
+    .activity-timeline {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 40px;
+        padding-bottom: 25px;
+    }
+    
+    .timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 30px;
+        bottom: 0;
+        width: 1px;
+        background-color: var(--border-color);
+    }
+    
+    .timeline-icon {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 30px;
+        height: 30px;
+        background-color: var(--secondary-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        z-index: 1;
+    }
+    
+    .timeline-content {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 15px;
+    }
+    
+    .timeline-content h4 {
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+    
+    .timeline-date {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+    }
+    
+    .timeline-date i {
+        margin-right: 5px;
+    }
+    
+    .no-activity {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        color: var(--text-secondary);
+    }
+    
+    .no-activity i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .content-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .profile-container {
+            flex-direction: column;
+            margin: 0;
+            border-radius: 0;
+        }
+        
+        .sidebar {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 0;
+        }
+        
+        .profile-nav {
+            flex-direction: row;
+            overflow-x: auto;
+            padding: 10px;
+            margin-top: 0;
+        }
+        
+        .nav-item {
+            flex-shrink: 0;
+            padding: 10px 15px;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        .stats-container, 
+        .campaigns-list, 
+        .social-accounts-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .password-row {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab Navigation
+        const tabLinks = document.querySelectorAll('.nav-item');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all tabs and contents
+                tabLinks.forEach(tab => tab.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Performance Chart
+        if(document.getElementById('performanceChart')) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const earnings = [120, 190, 300, 250, 220, 390, 320];
+            const engagement = [3.2, 4.1, 3.8, 4.5, 4.9, 5.2, 4.7];
+            
+            // Line chart configuration (using Chart.js)
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Earnings ($)',
+                            data: earnings,
+                            borderColor: '#ffffff',
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            tension: 0.4,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'Engagement (%)',
+                            data: engagement,
+                            borderColor: '#4CAF50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            tension: 0.4,
+                            yAxisID: 'y1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            position: 'left',
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            ticks: {
+                                color: 'rgba(76, 175, 80, 0.7)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
+

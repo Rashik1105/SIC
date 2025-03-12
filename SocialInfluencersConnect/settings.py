@@ -32,14 +32,14 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 # Security settings
-SECURE_SSL_REDIRECT = True
+# SECURE_SSL_REDIRECT = True
 
 # CORS settings - important for WebSockets
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    "https://socialinfluencersconnect-production.up.railway.app/",
-]
+# CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOWED_ORIGINS = [
+# "https://socialinfluencersconnect-production.up.railway.app/",
+
 
 # WebSocket settings for better connection stability
 WEBSOCKET_PING_INTERVAL = 20  # Send a ping every 20 seconds
