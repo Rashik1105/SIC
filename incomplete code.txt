@@ -1,0 +1,938 @@
+{% extends "sic/base.html" %}
+{% block title %}{{ youtube_user.channel_name }} - Creator Profile{% endblock %}
+{% block content %}
+
+<div class="creator-profile-container">
+    <!-- Header Banner -->
+    <div class="creator-banner">
+        <div class="creator-avatar">
+            {% if youtube_user.profile_image %}
+                <img src="{{ youtube_user.profile_image }}" alt="{{ youtube_user.channel_name }}">
+            {% else %}
+                <div class="avatar-placeholder">{{ youtube_user.channel_name.0|upper }}</div>
+            {% endif %}
+        </div>
+        <div class="creator-header-info">
+            <h1>{{ youtube_user.channel_name }}</h1>
+            <div class="creator-metrics">
+                <div class="metric">
+                    <i class="fas fa-users"></i>
+                    <span class="count">{{ total_subscribers|intcomma }}</span>
+                    <span class="label">Subscribers</span>
+                </div>
+                <div class="metric">
+                    <i class="fas fa-eye"></i>
+                    <span class="count">{{ total_views|intcomma }}</span>
+                    <span class="label">Total Views</span>
+                </div>
+                <div class="metric">
+                    <i class="fas fa-tag"></i>
+                    <span class="count">{{ youtube_user.channel_category }}</span>
+                    <span class="label">Category</span>
+                </div>
+                <div class="metric">
+                    <i class="fas fa-globe-americas"></i>
+                    <span class="count">{{ country }}</span>
+                    <span class="label">Country</span>
+                </div>
+            </div>
+        </div>
+        <div class="creator-actions">
+            {% if request.user.groups.filter(name="BusinessUser").exists %}
+                <button id="contactCreatorBtn" class="btn btn-primary"><i class="fas fa-comment-dots"></i> Contact Creator</button>
+                <button id="saveCreatorBtn" class="btn btn-outline-primary"><i class="fas fa-bookmark"></i> Save</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="creator-content">
+        <!-- Left Sidebar -->
+        <div class="creator-sidebar">
+            <div class="creator-card">
+                <h3><i class="fas fa-info-circle"></i> Creator Info</h3>
+                <ul>
+                    <li><i class="fas fa-user"></i> <strong>Owner:</strong> {{ youtube_user.owner_name }}</li>
+                    <li><i class="fas fa-phone"></i> <strong>Contact:</strong> {{ youtube_user.phone_number }}</li>
+                    <li><i class="fas fa-envelope"></i> <strong>Email:</strong> {{ youtube_user.user.email }}</li>
+                    <li><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> {{ country }}</li>
+                </ul>
+            </div>
+
+            <div class="creator-card social-links">
+                <h3><i class="fas fa-share-alt"></i> Social Platforms</h3>
+                <div class="social-icons">
+                    <a href="https://youtube.com/channel/{{ youtube_user.user.username }}" target="_blank" class="social-icon youtube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    {% if youtube_user.instagram_token %}
+                    <a href="https://instagram.com/{{ youtube_user.instagram_id }}" target="_blank" class="social-icon instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    {% endif %}
+                    {% if youtube_user.facebook_token %}
+                    <a href="https://facebook.com/{{ youtube_user.facebook_id }}" target="_blank" class="social-icon facebook">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    {% endif %}
+                    {% if youtube_user.x_token %}
+                    <a href="https://x.com/{{ youtube_user.x_id }}" target="_blank" class="social-icon twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="audience-insights">
+                    <h4>Audience Insights</h4>
+                    <div class="insight-chart" id="demographicsChart"></div>
+                    <div class="insight-chart" id="engagementChart"></div>
+                </div>
+            </div>
+
+            {% if campaign_history %}
+            <div class="creator-card campaign-history">
+                <h3><i class="fas fa-history"></i> Campaign History</h3>
+                <ul class="campaign-list">
+                    {% for campaign in campaign_history %}
+                    <li>
+                        <span class="campaign-date">{{ campaign.date }}</span>
+                        <span class="campaign-name">{{ campaign.name }}</span>
+                        <span class="campaign-result {{ campaign.status|lower }}">{{ campaign.status }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="creator-main-content">
+            <!-- Content Tabs -->
+            <div class="content-tabs">
+                <button class="tab-button active" data-tab="youtube">YouTube</button>
+                {% if instagram_posts %}<button class="tab-button" data-tab="instagram">Instagram</button>{% endif %}
+                {% if facebook_posts %}<button class="tab-button" data-tab="facebook">Facebook</button>{% endif %}
+                {% if x_posts %}<button class="tab-button" data-tab="twitter">X (Twitter)</button>{% endif %}
+                <button class="tab-button" data-tab="analytics">Analytics</button>
+            </div>
+
+            <!-- YouTube Tab -->
+            <div class="tab-content active" id="youtube-content">
+                <h3><i class="fab fa-youtube"></i> Latest YouTube Videos</h3>
+                <div class="video-grid">
+                    {% for video in videos %}
+                    <div class="video-card" data-video-id="{{ video.video_id }}">
+                        <div class="video-thumbnail">
+                            <img src="{{ video.thumbnail }}" alt="{{ video.title }}">
+                            <div class="video-duration">{{ video.duration|default:"" }}</div>
+                            <button class="play-button"><i class="fas fa-play"></i></button>
+                        </div>
+                        <div class="video-details">
+                            <h4 title="{{ video.title }}">{{ video.title }}</h4>
+                            <div class="video-stats">
+                                <span><i class="fas fa-eye"></i> {{ video.views|intcomma }}</span>
+                                <span><i class="fas fa-thumbs-up"></i> {{ video.likes|intcomma }}</span>
+                                <span><i class="fas fa-comment"></i> {{ video.comments|intcomma }}</span>
+                                <span class="video-date"><i class="fas fa-calendar-alt"></i> {{ video.published_at|default:"" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Instagram Tab -->
+            {% if instagram_posts %}
+            <div class="tab-content" id="instagram-content">
+                <h3><i class="fab fa-instagram"></i> Latest Instagram Posts</h3>
+                <div class="instagram-grid">
+                    {% for post in instagram_posts %}
+                    <div class="instagram-post">
+                        <div class="post-media">
+                            {% if post.media_type == "IMAGE" or post.media_type == "CAROUSEL_ALBUM" %}
+                            <img src="{{ post.media_url }}" alt="Instagram Post">
+                            {% elif post.media_type == "VIDEO" %}
+                            <video controls>
+                                <source src="{{ post.media_url }}" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                            {% endif %}
+                        </div>
+                        <div class="post-details">
+                            <p class="post-caption">{{ post.caption|default:"No caption"|truncatechars:100 }}</p>
+                            <a href="{{ post.permalink }}" class="view-post-link" target="_blank">
+                                <i class="fas fa-external-link-alt"></i> View Original Post
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Facebook Tab -->
+            {% if facebook_posts %}
+            <div class="tab-content" id="facebook-content">
+                <h3><i class="fab fa-facebook"></i> Latest Facebook Posts</h3>
+                <div class="facebook-posts">
+                    {% for post in facebook_posts %}
+                    <div class="facebook-post">
+                        <div class="post-header">
+                            <i class="fab fa-facebook"></i>
+                            <span class="post-date">{{ post.created_time }}</span>
+                        </div>
+                        <div class="post-content">
+                            <p>{{ post.message|default:"No caption" }}</p>
+                        </div>
+                        <div class="post-footer">
+                            <a href="{{ post.permalink_url }}" target="_blank" class="view-post-btn">
+                                <i class="fas fa-external-link-alt"></i> View on Facebook
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Twitter Tab -->
+            {% if x_posts %}
+            <div class="tab-content" id="twitter-content">
+                <h3><i class="fab fa-twitter"></i> Latest X (Twitter) Posts</h3>
+                <div class="twitter-posts">
+                    {% for post in x_posts %}
+                    <div class="twitter-post">
+                        <div class="post-header">
+                            <i class="fab fa-twitter"></i>
+                            <span class="post-date">{{ post.created_at }}</span>
+                        </div>
+                        <div class="post-content">
+                            <p>{{ post.text }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Analytics Tab -->
+            <div class="tab-content" id="analytics-content">
+                <h3><i class="fas fa-chart-line"></i> Channel Analytics</h3>
+                <div class="analytics-container">
+                    <div class="analytics-card">
+                        <h4>Subscriber Growth</h4>
+                        <div class="chart-container" id="subscriberGrowthChart"></div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4>View Distribution</h4>
+                        <div class="chart-container" id="viewDistributionChart"></div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4>Engagement Rate</h4>
+                        <div class="chart-container" id="engagementRateChart"></div>
+                    </div>
+                    <div class="analytics-card">
+                        <h4>Audience Demographics</h4>
+                        <div class="chart-container" id="audienceDemographicsChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video Modal -->
+<div id="videoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <div class="video-container">
+            <iframe id="videoFrame" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Creator Modal -->
+<div id="contactModal" class="modal">
+    <div class="modal-content contact-modal">
+        <span class="close-modal">&times;</span>
+        <h3>Contact {{ youtube_user.channel_name }}</h3>
+        <form id="contactCreatorForm" method="post" action="{% url 'start_chat' youtube_user.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="messageSubject">Subject</label>
+                <input type="text" id="messageSubject" name="subject" placeholder="Collaboration opportunity" required>
+            </div>
+            <div class="form-group">
+                <label for="messageContent">Message</label>
+                <textarea id="messageContent" name="message" rows="5" placeholder="Hi, I'm interested in working with you on a campaign..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+        </form>
+    </div>
+</div>
+
+<style>
+/* General Styles */
+:root {
+    --primary-color: #1e88e5;
+    --secondary-color: #64b5f6;
+    --accent-color: #0d47a1;
+    --light-color: #f5f9ff;
+    --grey-color: #eaeef2;
+    --text-color: #333;
+    --border-radius: 10px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --transition: all 0.3s ease;
+}
+
+.creator-profile-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+}
+
+/* Creator Banner */
+.creator-banner {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    border-radius: var(--border-radius);
+    padding: 30px;
+    color: white;
+    margin-bottom: 30px;
+    box-shadow: var(--box-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.creator-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/static/images/pattern.svg') repeat;
+    opacity: 0.1;
+}
+
+.creator-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid white;
+    margin-right: 25px;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.creator-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary-color);
+}
+
+.creator-header-info {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.creator-header-info h1 {
+    margin: 0 0 15px 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.creator-metrics {
+    display: flex;
+    gap: 25px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(5px);
+    transition: var(--transition);
+}
+
+.metric:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
+}
+
+.metric i {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+.metric .count {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.metric .label {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin-top: 3px;
+}
+
+.creator-actions {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.btn {
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: var(--transition);
+    border: none;
+}
+
+.btn i {
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: white;
+    color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-outline-primary {
+    background-color: transparent;
+    border: 2px solid white;
+    color: white;
+}
+
+.btn-outline-primary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Content Layout */
+.creator-content {
+    display: flex;
+    gap: 30px;
+}
+
+.creator-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+}
+
+.creator-main-content {
+    flex: 1;
+}
+
+/* Creator Cards */
+.creator-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.creator-card h3 {
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.creator-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.creator-card li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grey-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.creator-card li:last-child {
+    border-bottom: none;
+}
+
+.creator-card li i {
+    color: var(--primary-color);
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+}
+
+/* Social Links */
+.social-icons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.social-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    transition: var(--transition);
+}
+
+.social-icon:hover {
+    transform: translateY(-3px);
+}
+
+.social-icon.youtube {
+    background-color: #FF0000;
+}
+
+.social-icon.instagram {
+    background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+}
+
+.social-icon.facebook {
+    background-color: #1877F2;
+}
+
+.social-icon.twitter {
+    background-color: #1DA1F2;
+}
+
+/* Audience Insights */
+.audience-insights {
+    margin-top: 20px;
+}
+
+.audience-insights h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.insight-chart {
+    height: 150px;
+    margin-bottom: 15px;
+    background-color: var(--grey-color);
+    border-radius: var(--border-radius);
+    opacity: 0.7;
+}
+
+/* Campaign History */
+.campaign-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.campaign-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grey-color);
+}
+
+.campaign-date {
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.campaign-result {
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+}
+
+.campaign-result.completed {
+    background-color: #E6F7ED;
+    color: #0D904F;
+}
+
+.campaign-result.ongoing {
+    background-color: #FFF4E5;
+    color: #F59E0B;
+}
+
+/* Tabs */
+.content-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.tab-button {
+    padding: 12px 20px;
+    background-color: #f0f4f8;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.tab-button:hover {
+    background-color: #e2e8f0;
+    color: var(--primary-color);
+}
+
+.tab-button.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.tab-content {
+    display: none;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 25px;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* YouTube Videos Grid */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.video-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.video-card:hover .play-button {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.video-thumbnail {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    overflow: hidden;
+}
+
+.video-thumbnail img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.video-card:hover .video-thumbnail img {
+    transform: scale(1.05);
+}
+
+.play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background-color: var(--primary-color);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    opacity: 0;
+    transition: var(--transition);
+    border: 3px solid white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.video-duration {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.video-details {
+    padding: 15px;
+}
+
+.video-details h4 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.video-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.video-stats span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.video-date {
+    margin-left: auto;
+}
+
+/* Instagram Grid */
+.instagram-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.instagram-post {
+    background-color: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: var(--transition);
+}
+
+.instagram-post:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.post-media {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* 1:1 Aspect Ratio */
+    overflow: hidden;
+}
+
+.post-media img, .post-media video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post-details {
+    padding: 15px;
+}
+
+.post-caption {
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    color: #555;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.view-post-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.view-post-link:hover {
+    color: var(--accent-color);
+}
+
+/* Facebook Posts */
+.facebook-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.facebook-post {
+    background-color: #f8fafc;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    transition: var(--transition);
+    border-left: 4px solid #1877F2;
+}
+
+.facebook-post:hover {
+    background-color: #f0f4f8;
+    transform: translateX(5px);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.post-header i {
+    color: #1877F2;
+    font-size: 1.2rem;
+}
+
+.post-content {
+    margin-bottom: 15px;
+}
+
+.post-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.view-post-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background-color: #f0f2f5;
+    color: #1877F2;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.view-post-btn:hover {
+    background-color: #e4e6eb;
+}
+
+/* Twitter Posts */
+.twitter-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.twitter-post {
+    background-color: #f8fafc;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    transition: var(--transition);
+    border-left: 4px solid #1DA1F2;
+}
+
+.twitter-post:hover {
+    background-color: #f0f4f8;
+    transform: translateX(5px);
+}
+
+.twitter-post .post-header i {
+    color: #1DA1F2;
+}
+
+/* Analytics Tab */
+.analytics-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
+    gap: 20px;
+}
+
+.analytics-card {
+    background-color: #f8fafc;
+    border-radius: var(--border-radius);
+    padding: 20
