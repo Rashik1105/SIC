@@ -1,0 +1,396 @@
+{% extends "sic/base.html" %}
+{% block headContent %}
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- AOS (Animate On Scroll) library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+{% endblock headContent %}
+{% block content %}
+<div class="container">
+    <h2 class="title">Business Directory</h2>
+    <p class="subtitle">Connect with trusted professionals in your area</p>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <form method="GET" class="search-form">
+            <div class="search-input-wrapper">
+                <i class="search-icon fas fa-search"></i>
+                <input type="text" name="search" placeholder="Search by name, category, email..." value="{{ search_query }}" class="search-input">
+            </div>
+            <button type="submit" class="search-button">Search</button>
+        </form>
+    </div>
+
+    {% if business_list %}
+    <ul class="business-list">
+        {% for business in business_list %}
+            <li class="business-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0 }}00">
+                <div class="business-card">
+                    <div class="business-header">
+                        <h3 class="business-name">{{ business.business_name }}</h3>
+                        <span class="business-category">{{ business.business_category }}</span>
+                    </div>
+                    
+                    <div class="business-actions">
+                        <button class="action-btn chat-btn" onclick="window.location='{% url 'start_chat' business.id %}'">
+                            <i class="fas fa-comment-alt"></i>
+                            <span>Chat</span>
+                        </button>
+                        <button class="action-btn info-btn" onclick="toggleDetails('details-{{ forloop.counter }}')" aria-expanded="false">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Details</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Hidden Business Details -->
+                    <div class="business-details" id="details-{{ forloop.counter }}">
+                        <div class="details-content">
+                            <div class="detail-item">
+                                <i class="fas fa-building"></i>
+                                <span><strong>Category:</strong> {{ business.business_category }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-envelope"></i>
+                                <span><strong>Email:</strong> <a href="mailto:{{ business.business_email }}">{{ business.business_email }}</a></span>
+                            </div>
+                            {% if business.phone_number %}
+                            <div class="detail-item">
+                                <i class="fas fa-phone"></i>
+                                <span><strong>Phone:</strong> <a href="tel:{{ business.phone_number }}">{{ business.phone_number }}</a></span>
+                            </div>
+                            {% endif %}
+                            {% if business.website %}
+                            <div class="detail-item">
+                                <i class="fas fa-globe"></i>
+                                <span><strong>Website:</strong> <a href="{{ business.website }}" target="_blank" rel="noopener noreferrer">{{ business.website }}</a></span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="no-results" data-aos="fade-in">
+        <i class="fas fa-search-minus"></i>
+        <p>No matching businesses found. Try adjusting your search criteria.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
+<!-- Styles -->
+<style>
+    :root {
+        --primary-color: #3a5a78;
+        --secondary-color: #4e9cc0;
+        --accent-color: #e5c687;
+        --light-color: #f8f9fa;
+        --dark-color: #343a40;
+        --success-color: #4e9d6d;
+        --border-radius: 12px;
+        --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+    
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f7f9fc;
+        color: #333;
+    }
+    
+    .container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+    
+    .title {
+        font-size: 32px;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .subtitle {
+        color: #666;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 16px;
+    }
+    
+    /* Search Container */
+    .search-container {
+        margin-bottom: 30px;
+    }
+    
+    .search-form {
+        display: flex;
+        max-width: 700px;
+        margin: 0 auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        border-radius: var(--border-radius);
+    }
+    
+    .search-input-wrapper {
+        position: relative;
+        flex: 1;
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #aaa;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 16px 16px 16px 45px;
+        font-size: 16px;
+        border: 1px solid #e1e5e9;
+        border-right: none;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+        background-color: #fff;
+        transition: var(--transition);
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 2px rgba(78, 156, 192, 0.2);
+    }
+    
+    .search-button {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 0 25px;
+        border: none;
+        cursor: pointer;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        font-size: 16px;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+    
+    .search-button:hover {
+        background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Business List */
+    .business-list {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+    
+    .business-item {
+        margin-bottom: 20px;
+    }
+    
+    .business-card {
+        background: #fff;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        transition: var(--transition);
+        border: 1px solid #eaedf3;
+    }
+    
+    .business-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .business-header {
+        padding: 20px;
+        border-bottom: 1px solid #eaedf3;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .business-name {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--dark-color);
+        margin: 0;
+    }
+    
+    .business-category {
+        background-color: var(--accent-color);
+        color: #333;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .business-actions {
+        display: flex;
+        padding: 15px 20px;
+        background-color: #f8f9fb;
+    }
+    
+    .action-btn {
+        flex: 1;
+        border: none;
+        background: transparent;
+        color: var(--primary-color);
+        padding: 10px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: var(--transition);
+        border-radius: 6px;
+    }
+    
+    .action-btn:hover {
+        background-color: rgba(58, 90, 120, 0.1);
+    }
+    
+    .chat-btn:hover {
+        color: var(--success-color);
+    }
+    
+    .info-btn:hover {
+        color: var(--secondary-color);
+    }
+    
+    .action-btn i {
+        font-size: 16px;
+    }
+    
+    /* Business Details */
+    .business-details {
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background-color: #f8f9fb;
+    }
+    
+    .business-details.active {
+        height: auto;
+        opacity: 1;
+        padding: 20px;
+        border-top: 1px solid #eaedf3;
+    }
+    
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .detail-item i {
+        color: var(--secondary-color);
+        font-size: 16px;
+        width: 20px;
+    }
+    
+    .detail-item a {
+        color: var(--secondary-color);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .detail-item a:hover {
+        color: var(--primary-color);
+        text-decoration: underline;
+    }
+    
+    /* No Results */
+    .no-results {
+        text-align: center;
+        padding: 30px;
+        background-color: #f8f9fb;
+        border-radius: var(--border-radius);
+        border: 1px dashed #ddd;
+        margin-top: 20px;
+    }
+    
+    .no-results i {
+        font-size: 40px;
+        color: #aaa;
+        margin-bottom: 15px;
+    }
+    
+    .no-results p {
+        font-size: 16px;
+        color: #777;
+        margin: 0;
+    }
+    
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+        .container {
+            padding: 20px;
+            margin: 20px;
+        }
+        
+        .search-form {
+            flex-direction: column;
+        }
+        
+        .search-input {
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            border-right: 1px solid #e1e5e9;
+        }
+        
+        .search-button {
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            padding: 12px;
+        }
+        
+        .business-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .business-category {
+            align-self: flex-start;
+        }
+    }
+</style>
+
+<!-- Scripts -->
+<script>
+    // Initialize AOS (Animate On Scroll)
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            mirror: false
+        });
+    });
+    
+    // Toggle details function
+    function toggleDetails(id) {
+        const details = document.getElementById(id);
+        if (details.classList.contains('active')) {
+            details.classList.remove('active');
+        } else {
+            document.querySelectorAll('.business-details.active').forEach(item => {
+                if (item.id !== id) item.classList.remove('active');
+            });
+            details.classList.add('active');
+        }
+    }
+</script>
+{% endblock %}
